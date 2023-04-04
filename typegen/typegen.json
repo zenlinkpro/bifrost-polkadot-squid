@@ -1,0 +1,51 @@
+{
+  "outDir": "../src/types",
+  "specVersions": "https://bifrost.archive.subsquid.io/graphql",
+  "typesBundle": "bifrost",
+  "events": [
+    "Currencies.Transferred",
+    "Currencies.Deposited",
+    "Currencies.Withdrawn",
+    "Farming.FarmingPoolCreated",
+    "Farming.FarmingPoolReset",
+    "Farming.FarmingPoolClosed",
+    "Farming.FarmingPoolKilled",
+    "Farming.FarmingPoolEdited",
+    "Farming.Charged",
+    "Farming.Deposited",
+    "Farming.Withdrawn",
+    "Farming.Claimed",
+    "Farming.WithdrawClaimed",
+    "Farming.GaugeWithdrawn",
+    "Farming.AllForceGaugeClaimed",
+    "Farming.PartiallyForceGaugeClaimed",
+    "Farming.AllRetired",
+    "Farming.PartiallyRetired",
+    "Farming.RetireLimitSet",
+
+
+    "Tokens.Transfer",
+    "Tokens.Deposited",
+    "Tokens.Withdrawn",
+    "Tokens.BalanceSet",
+    "ZenlinkProtocol.AssetSwap",
+    "ZenlinkProtocol.LiquidityAdded",
+    "ZenlinkProtocol.LiquidityRemoved"
+  ],
+  "calls": [],
+  "storage": [
+    "AssetRegistry.CurrencyMetadatas",
+    "System.Account",
+    "Balances.TotalIssuance",
+    "Farming.PoolInfos",
+    "Farming.GaugePoolInfos",
+    "Farming.GaugeInfos",
+    "Farming.SharesAndWithdrawnRewards",
+    "System.BlockHash",
+    "Timestamp.Now",
+    "Tokens.Accounts",
+    "Tokens.TotalIssuance",
+    "ZenlinkProtocol.PairStatuses",
+    "ZenlinkProtocol.LiquidityPairs"
+  ]
+}
