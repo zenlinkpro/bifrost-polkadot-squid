@@ -1,12 +1,12 @@
 import type {Result, Option} from './support'
 
-export interface Type_679 {
+export interface PoolInfo {
     tokensProportion: [CurrencyId, number][]
     basicToken: [CurrencyId, number]
     totalShares: bigint
     basicRewards: [CurrencyId, bigint][]
     rewards: [CurrencyId, [bigint, bigint]][]
-    state: Type_685
+    state: PoolState
     keeper: Uint8Array
     rewardIssuer: Uint8Array
     gauge: (number | undefined)
@@ -85,25 +85,25 @@ export interface CurrencyId_StableLpToken {
     value: number
 }
 
-export type Type_685 = Type_685_UnCharged | Type_685_Charged | Type_685_Ongoing | Type_685_Dead | Type_685_Retired
+export type PoolState = PoolState_UnCharged | PoolState_Charged | PoolState_Ongoing | PoolState_Dead | PoolState_Retired
 
-export interface Type_685_UnCharged {
+export interface PoolState_UnCharged {
     __kind: 'UnCharged'
 }
 
-export interface Type_685_Charged {
+export interface PoolState_Charged {
     __kind: 'Charged'
 }
 
-export interface Type_685_Ongoing {
+export interface PoolState_Ongoing {
     __kind: 'Ongoing'
 }
 
-export interface Type_685_Dead {
+export interface PoolState_Dead {
     __kind: 'Dead'
 }
 
-export interface Type_685_Retired {
+export interface PoolState_Retired {
     __kind: 'Retired'
 }
 

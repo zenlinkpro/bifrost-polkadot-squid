@@ -6,17 +6,17 @@ import { Pair } from '../model'
 import { EventHandlerContext } from '../types'
 import { assetIdFromAddress } from './token'
 
-export const WNATIVE = '2001-0-0'
-export const USDC = '2001-2-2048'
-export const KSM = '2001-2-516'
-export const aUSD = '2001-2-770'
-export const WNATIVE_USDC = '2001-2-8796093023744'
+export const WNATIVE = '2030-0-0'
+export const USDC = '2030-2-2050'
+export const DOT = '2030-2-2048'
+export const aUSD = '2030-2-770'
+export const WNATIVE_USDC = '2030-2-8796093023744'
 
 export const WHITELIST: string[] = [
-  '2001-0-0', // wnative
-  '2001-2-2048', // usdc
-  '2001-2-519', // zlk
-  '2001-2-516' // ksm
+  '2030-0-0', // wnative
+  '2030-2-2050', // usdc
+  '2030-2-519', // zlk
+  '2030-2-516' // ksm
 ]
 
 // minimum liquidity required to count towards tracked volume for pairs with small # of Lps
@@ -33,14 +33,14 @@ export async function getEthPriceInUSD(ctx: EventHandlerContext): Promise<BigDec
       : BigDecimal(usdcPair.token1Price)
   }
 
-  // get ethprice from bnc-ksm > ksm-aUSD pair
-  const ksmPair = await getPair(ctx, [assetIdFromAddress(KSM), assetIdFromAddress(aUSD)])
-  const wnativePair = await getPair(ctx, [assetIdFromAddress(WNATIVE), assetIdFromAddress(KSM)])
+  // get ethprice from bnc-dot > dot-usdt pair
+  const ksmPair = await getPair(ctx, [assetIdFromAddress(DOT), assetIdFromAddress(USDC)])
+  const wnativePair = await getPair(ctx, [assetIdFromAddress(WNATIVE), assetIdFromAddress(DOT)])
   if (ksmPair && wnativePair) {
-    const ksmPrice = ksmPair.token0.id === aUSD
+    const ksmPrice = ksmPair.token0.id === USDC
       ? BigDecimal(ksmPair.token0Price)
       : BigDecimal(ksmPair.token1Price)
-    return wnativePair.token0.id === KSM
+    return wnativePair.token0.id === DOT
       ? BigDecimal(wnativePair.token0Price).mul(ksmPrice)
       : BigDecimal(wnativePair.token1Price).mul(ksmPrice)
   }

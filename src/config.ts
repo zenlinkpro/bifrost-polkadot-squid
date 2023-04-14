@@ -1,10 +1,11 @@
 import { ProcessorConfig } from "./types";
+import {lookupArchive} from "@subsquid/archive-registry"
 
 export const config: ProcessorConfig = {
   chainName: 'bifrost',
   prefix: 'bifrost',
   dataSource: {
-    archive: 'https://bifrost.archive.subsquid.io/graphql',
-    chain: 'wss://bifrost-parachain.api.onfinality.io/public-ws',
+    archive: lookupArchive('bifrost-polkadot', {type: "Substrate"} ),
+    chain: 'wss://bifrost-polkadot.api.onfinality.io/public-ws',
   },
 }

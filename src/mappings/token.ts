@@ -1,7 +1,7 @@
 import { codec } from '@subsquid/ss58'
 import { getPair } from "../entities/pair";
 import { getPosition, getTransaction } from "../entities/utils";
-import { ZERO_BD } from '../constants';
+import { CHAIN_ID, ZERO_BD } from '../constants';
 import { EventHandlerContext, TOEKN_EVENT_TYPE } from "../types";
 import { config } from "../config";
 import { Big as BigDecimal } from 'big.js'
@@ -18,9 +18,9 @@ import {
   User
 } from "../model";
 import {
-  CurrenciesDepositedEvent,
-  CurrenciesTransferredEvent,
-  CurrenciesWithdrawnEvent,
+  // CurrenciesDepositedEvent,
+  // CurrenciesTransferredEvent,
+  // CurrenciesWithdrawnEvent,
   TokensDepositedEvent,
   TokensTransferEvent,
   TokensWithdrawnEvent
@@ -42,24 +42,24 @@ export async function handleTokenDeposited(ctx: EventHandlerContext, type: TOEKN
   if (!transactionHash) return
   let event
   if (type === TOEKN_EVENT_TYPE.Currencies) {
-    const _event = new CurrenciesDepositedEvent(ctx, ctx.event)
-    if (_event.isV802) {
-      event = { currencyId: _event.asV802[0], who: _event.asV802[1], amount: _event.asV802[2] }
-    } else if (_event.isV906) {
-      event = { currencyId: _event.asV906[0], who: _event.asV906[1], amount: _event.asV906[2] }
-    } else if (_event.isV916) {
-      event = { currencyId: _event.asV916[0], who: _event.asV916[1], amount: _event.asV916[2] }
-    } else if (_event.isV920) {
-      event = { currencyId: _event.asV920[0], who: _event.asV920[1], amount: _event.asV920[2] }
-    } else if (_event.isV925) {
-      event = _event.asV925
-    } else if (_event.isV932) {
-      event = _event.asV932
-    }
+    // const _event = new CurrenciesDepositedEvent(ctx, ctx.event)
+    // if (_event.isV802) {
+    //   event = { currencyId: _event.asV802[0], who: _event.asV802[1], amount: _event.asV802[2] }
+    // } else if (_event.isV906) {
+    //   event = { currencyId: _event.asV906[0], who: _event.asV906[1], amount: _event.asV906[2] }
+    // } else if (_event.isV916) {
+    //   event = { currencyId: _event.asV916[0], who: _event.asV916[1], amount: _event.asV916[2] }
+    // } else if (_event.isV920) {
+    //   event = { currencyId: _event.asV920[0], who: _event.asV920[1], amount: _event.asV920[2] }
+    // } else if (_event.isV925) {
+    //   event = _event.asV925
+    // } else if (_event.isV932) {
+    //   event = _event.asV932
+    // }
   } else {
     const _event = new TokensDepositedEvent(ctx, ctx.event)
-    if (_event.isV944) {
-      event = _event.asV944
+    if (_event.isV952) {
+      event = _event.asV952
     } else if (_event.isV956) {
       event = _event.asV956
     } else if (_event.isV962) {
@@ -72,8 +72,8 @@ export async function handleTokenDeposited(ctx: EventHandlerContext, type: TOEKN
 
   const token0Index = parseToTokenIndex(token0Id, Number(invertedTokenSymbolMap[token0Symbol.__kind]))
   const token1Index = parseToTokenIndex(token1Id, Number(invertedTokenSymbolMap[token1Symbol.__kind]))
-  const asset0 = { chainId: 2001, assetType: token0Index === 0 ? 0 : 2, assetIndex: BigInt(token0Index) }
-  const asset1 = { chainId: 2001, assetType: token1Index === 0 ? 0 : 2, assetIndex: BigInt(token1Index) }
+  const asset0 = { chainId: CHAIN_ID, assetType: token0Index === 0 ? 0 : 2, assetIndex: BigInt(token0Index) }
+  const asset1 = { chainId: CHAIN_ID, assetType: token1Index === 0 ? 0 : 2, assetIndex: BigInt(token1Index) }
 
   const pair = await getPair(ctx, [asset0, asset1])
   if (!pair) return
@@ -134,24 +134,24 @@ export async function handleTokenWithdrawn(ctx: EventHandlerContext, type: TOEKN
   if (!transactionHash) return
   let event
   if (type === TOEKN_EVENT_TYPE.Currencies) {
-    const _event = new CurrenciesWithdrawnEvent(ctx, ctx.event)
-    if (_event.isV802) {
-      event = { currencyId: _event.asV802[0], who: _event.asV802[1], amount: _event.asV802[2] }
-    } else if (_event.isV906) {
-      event = { currencyId: _event.asV906[0], who: _event.asV906[1], amount: _event.asV906[2] }
-    } else if (_event.isV916) {
-      event = { currencyId: _event.asV916[0], who: _event.asV916[1], amount: _event.asV916[2] }
-    } else if (_event.isV920) {
-      event = { currencyId: _event.asV920[0], who: _event.asV920[1], amount: _event.asV920[2] }
-    } else if (_event.isV925) {
-      event = _event.asV925
-    } else if (_event.isV932) {
-      event = _event.asV932
-    }
+    // const _event = new CurrenciesWithdrawnEvent(ctx, ctx.event)
+    // if (_event.isV802) {
+    //   event = { currencyId: _event.asV802[0], who: _event.asV802[1], amount: _event.asV802[2] }
+    // } else if (_event.isV906) {
+    //   event = { currencyId: _event.asV906[0], who: _event.asV906[1], amount: _event.asV906[2] }
+    // } else if (_event.isV916) {
+    //   event = { currencyId: _event.asV916[0], who: _event.asV916[1], amount: _event.asV916[2] }
+    // } else if (_event.isV920) {
+    //   event = { currencyId: _event.asV920[0], who: _event.asV920[1], amount: _event.asV920[2] }
+    // } else if (_event.isV925) {
+    //   event = _event.asV925
+    // } else if (_event.isV932) {
+    //   event = _event.asV932
+    // }
   } else {
     const _event = new TokensWithdrawnEvent(ctx, ctx.event)
-    if (_event.isV944) {
-      event = _event.asV944
+    if (_event.isV952) {
+      event = _event.asV952
     } else if (_event.isV956) {
       event = _event.asV956
     } else if (_event.isV962) {
@@ -164,8 +164,8 @@ export async function handleTokenWithdrawn(ctx: EventHandlerContext, type: TOEKN
 
   const token0Index = parseToTokenIndex(token0Id, Number(invertedTokenSymbolMap[token0Symbol.__kind]))
   const token1Index = parseToTokenIndex(token1Id, Number(invertedTokenSymbolMap[token1Symbol.__kind]))
-  const asset0 = { chainId: 2001, assetType: token0Index === 0 ? 0 : 2, assetIndex: BigInt(token0Index) }
-  const asset1 = { chainId: 2001, assetType: token1Index === 0 ? 0 : 2, assetIndex: BigInt(token1Index) }
+  const asset0 = { chainId: CHAIN_ID, assetType: token0Index === 0 ? 0 : 2, assetIndex: BigInt(token0Index) }
+  const asset1 = { chainId: CHAIN_ID, assetType: token1Index === 0 ? 0 : 2, assetIndex: BigInt(token1Index) }
 
   const pair = await getPair(ctx, [asset0, asset1])
   if (!pair) return
@@ -259,34 +259,24 @@ export async function handleTokenWithdrawn(ctx: EventHandlerContext, type: TOEKN
 export async function handleTokenTransfer(ctx: EventHandlerContext, type: TOEKN_EVENT_TYPE) {
   let event
   if (type === TOEKN_EVENT_TYPE.Currencies) {
-    const _event = new CurrenciesTransferredEvent(ctx, ctx.event)
-    if (_event.isV802) {
-      event = { currencyId: _event.asV802[0], from: _event.asV802[1], to: _event.asV802[2], amount: _event.asV802[3] }
-    } else if (_event.isV906) {
-      event = { currencyId: _event.asV906[0], from: _event.asV906[1], to: _event.asV906[2], amount: _event.asV906[3] }
-    } else if (_event.isV916) {
-      event = { currencyId: _event.asV916[0], from: _event.asV916[1], to: _event.asV916[2], amount: _event.asV916[3] }
-    } else if (_event.isV920) {
-      event = { currencyId: _event.asV920[0], from: _event.asV920[1], to: _event.asV920[2], amount: _event.asV920[3] }
-    } else if (_event.isV925) {
-      event = _event.asV925
-    } else if (_event.isV932) {
-      event = _event.asV932
-    }
+    // const _event = new CurrenciesTransferredEvent(ctx, ctx.event)
+    // if (_event.isV802) {
+    //   event = { currencyId: _event.asV802[0], from: _event.asV802[1], to: _event.asV802[2], amount: _event.asV802[3] }
+    // } else if (_event.isV906) {
+    //   event = { currencyId: _event.asV906[0], from: _event.asV906[1], to: _event.asV906[2], amount: _event.asV906[3] }
+    // } else if (_event.isV916) {
+    //   event = { currencyId: _event.asV916[0], from: _event.asV916[1], to: _event.asV916[2], amount: _event.asV916[3] }
+    // } else if (_event.isV920) {
+    //   event = { currencyId: _event.asV920[0], from: _event.asV920[1], to: _event.asV920[2], amount: _event.asV920[3] }
+    // } else if (_event.isV925) {
+    //   event = _event.asV925
+    // } else if (_event.isV932) {
+    //   event = _event.asV932
+    // }
   } else {
     const _event = new TokensTransferEvent(ctx, ctx.event)
-    if (_event.isV802) {
-      event = { currencyId: _event.asV802[0], from: _event.asV802[1], to: _event.asV802[2], amount: _event.asV802[3] }
-    } else if (_event.isV906) {
-      event = { currencyId: _event.asV906[0], from: _event.asV906[1], to: _event.asV906[2], amount: _event.asV906[3] }
-    } else if (_event.isV916) {
-      event = { currencyId: _event.asV916[0], from: _event.asV916[1], to: _event.asV916[2], amount: _event.asV916[3] }
-    } else if (_event.isV920) {
-      event = { currencyId: _event.asV920[0], from: _event.asV920[1], to: _event.asV920[2], amount: _event.asV920[3] }
-    } else if (_event.isV925) {
-      event = _event.asV925
-    } else if (_event.isV932) {
-      event = _event.asV932
+    if (_event.isV952) {
+      event = _event.asV952
     } else if (_event.isV956) {
       event = _event.asV956
     } else if (_event.isV962) {
@@ -298,8 +288,8 @@ export async function handleTokenTransfer(ctx: EventHandlerContext, type: TOEKN_
   const [token0Symbol, token0Id, token1Symbol, token1Id] = event.currencyId.value
   const token0Index = parseToTokenIndex(token0Id, Number(invertedTokenSymbolMap[token0Symbol.__kind]))
   const token1Index = parseToTokenIndex(token1Id, Number(invertedTokenSymbolMap[token1Symbol.__kind]))
-  const asset0 = { chainId: 2001, assetType: token0Index === 0 ? 0 : 2, assetIndex: BigInt(token0Index) }
-  const asset1 = { chainId: 2001, assetType: token1Index === 0 ? 0 : 2, assetIndex: BigInt(token1Index) }
+  const asset0 = { chainId: CHAIN_ID, assetType: token0Index === 0 ? 0 : 2, assetIndex: BigInt(token0Index) }
+  const asset1 = { chainId: CHAIN_ID, assetType: token1Index === 0 ? 0 : 2, assetIndex: BigInt(token1Index) }
 
   const pair = await getPair(ctx, [asset0, asset1])
   if (!pair) return

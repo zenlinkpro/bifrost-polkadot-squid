@@ -10,10 +10,10 @@ const DataSelection = { data: { event: true } } as const
 
 const processor = new SubstrateBatchProcessor()
   .setDataSource(config.dataSource)
-  .setBlockRange({ from: 907128 })
-  .addEvent('Currencies.Transferred', DataSelection)
-  .addEvent('Currencies.Deposited', DataSelection)
-  .addEvent('Currencies.Withdrawn', DataSelection)
+  .setBlockRange({ from: 475025 })
+  // .addEvent('Currencies.Transferred', DataSelection)
+  // .addEvent('Currencies.Deposited', DataSelection)
+  // .addEvent('Currencies.Withdrawn', DataSelection)
   // farming
   .addEvent('Farming.FarmingPoolCreated', DataSelection)
   .addEvent('Farming.FarmingPoolReset', DataSelection)
@@ -46,15 +46,15 @@ processor.run(new TypeormDatabase(), async ctx => {
   for (let block of ctx.blocks) {
     for (let item of block.items) {
       switch (item.name) {
-        case 'Currencies.Deposited':
-          await handleTokenDeposited({ ...ctx, block: block.header, event: item.event }, TOEKN_EVENT_TYPE.Currencies)
-          break
-        case 'Currencies.Withdrawn':
-          await handleTokenWithdrawn({ ...ctx, block: block.header, event: item.event }, TOEKN_EVENT_TYPE.Currencies)
-          break
-        case 'Currencies.Transferred':
-          await handleTokenTransfer({ ...ctx, block: block.header, event: item.event }, TOEKN_EVENT_TYPE.Currencies)
-          break
+        // case 'Currencies.Deposited':
+        //   await handleTokenDeposited({ ...ctx, block: block.header, event: item.event }, TOEKN_EVENT_TYPE.Currencies)
+        //   break
+        // case 'Currencies.Withdrawn':
+        //   await handleTokenWithdrawn({ ...ctx, block: block.header, event: item.event }, TOEKN_EVENT_TYPE.Currencies)
+        //   break
+        // case 'Currencies.Transferred':
+        //   await handleTokenTransfer({ ...ctx, block: block.header, event: item.event }, TOEKN_EVENT_TYPE.Currencies)
+        //   break
         case 'Tokens.Deposited':
           await handleTokenDeposited({ ...ctx, block: block.header, event: item.event }, TOEKN_EVENT_TYPE.Tokens)
           break

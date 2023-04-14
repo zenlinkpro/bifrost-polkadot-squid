@@ -1,3 +1,4 @@
+import { CHAIN_ID } from "../constants";
 import { getPair } from "../entities/pair";
 import { getOrCreateToken } from "../entities/token";
 import { updateSingleTokenLockDayData, updateSingleTokenLockHourData } from "../mappings/farming/update";
@@ -13,8 +14,8 @@ import { addressFromAsset, currencyIdToAssetIndex, getPairAssetIdFromAssets, inv
 export function formatFarmingCreatedPoolEvent(ctx: EventHandlerContext){
   let event
   const _event =  new FarmingFarmingPoolCreatedEvent(ctx)
-  if(_event.isV944) {
-    event = _event.asV944
+  if(_event.isV954) {
+    event = _event.asV954
   }
   return event;
 }
@@ -22,8 +23,8 @@ export function formatFarmingCreatedPoolEvent(ctx: EventHandlerContext){
 export function formatFarmingPoolResetEvent(ctx: EventHandlerContext){
   let event
   const _event =  new FarmingFarmingPoolResetEvent(ctx)
-  if(_event.isV944) {
-    event = _event.asV944
+  if(_event.isV954) {
+    event = _event.asV954
   }
   return event;
 }
@@ -31,8 +32,8 @@ export function formatFarmingPoolResetEvent(ctx: EventHandlerContext){
 export function formatFarmingPoolClosedEvent(ctx: EventHandlerContext){
   let event
   const _event =  new FarmingFarmingPoolClosedEvent(ctx)
-  if(_event.isV944) {
-    event = _event.asV944
+  if(_event.isV954) {
+    event = _event.asV954
   }
   return event;
 }
@@ -40,8 +41,8 @@ export function formatFarmingPoolClosedEvent(ctx: EventHandlerContext){
 export function formatFarmingPoolKilledEvent(ctx: EventHandlerContext){
   let event
   const _event =  new FarmingFarmingPoolKilledEvent(ctx)
-  if(_event.isV944) {
-    event = _event.asV944
+  if(_event.isV954) {
+    event = _event.asV954
   }
   return event;
 }
@@ -49,8 +50,8 @@ export function formatFarmingPoolKilledEvent(ctx: EventHandlerContext){
 export function formatFarmingPoolEditedEvent(ctx: EventHandlerContext){
   let event
   const _event =  new FarmingFarmingPoolEditedEvent(ctx)
-  if(_event.isV944) {
-    event = _event.asV944
+  if(_event.isV954) {
+    event = _event.asV954
   }
   return event;
 }
@@ -58,8 +59,8 @@ export function formatFarmingPoolEditedEvent(ctx: EventHandlerContext){
 export function formatFarmingChargedEvent(ctx: EventHandlerContext){
   let event
   const _event =  new FarmingChargedEvent(ctx)
-  if(_event.isV944) {
-    event = _event.asV944
+  if(_event.isV954) {
+    event = _event.asV954
   }
   return event;
 }
@@ -67,79 +68,79 @@ export function formatFarmingChargedEvent(ctx: EventHandlerContext){
 export function formatFarmingDepositedEvent(ctx: EventHandlerContext){
   let event
   const _event =  new FarmingDepositedEvent(ctx)
-  if(_event.isV944) {
-    event = _event.asV944
+  if(_event.isV954) {
+    event = _event.asV954
   }
   return event;
 }
 export function formatFarmingWithdrawnEvent(ctx: EventHandlerContext){
   let event
   const _event =  new FarmingWithdrawnEvent(ctx)
-  if(_event.isV944) {
-    event = _event.asV944
+  if(_event.isV954) {
+    event = _event.asV954
   }
   return event;
 }export function formatFarmingClaimedEvent(ctx: EventHandlerContext){
   let event
   const _event =  new FarmingClaimedEvent(ctx)
-  if(_event.isV944) {
-    event = _event.asV944
+  if(_event.isV954) {
+    event = _event.asV954
   }
   return event;
 }
 export function formatFarmingWithdrawClaimedEvent(ctx: EventHandlerContext){
   let event
   const _event =  new FarmingWithdrawClaimedEvent(ctx)
-  if(_event.isV948) {
-    event = _event.asV948
+  if(_event.isV954) {
+    event = _event.asV954
   }
   return event;
 }
 export function formatFarmingGaugeWithdrawnEvent(ctx: EventHandlerContext){
   let event
   const _event =  new FarmingGaugeWithdrawnEvent(ctx)
-  if(_event.isV944) {
-    event = _event.asV944
+  if(_event.isV954) {
+    event = _event.asV954
   }
   return event;
 }
 export function formatFarmingAllForceGaugeClaimedEvent(ctx: EventHandlerContext){
   let event
   const _event =  new FarmingAllForceGaugeClaimedEvent(ctx)
-  if(_event.isV944) {
-    event = _event.asV944
+  if(_event.isV954) {
+    event = _event.asV954
   }
   return event;
 }
 export function formatFarmingPartiallyForceGaugeClaimedEvent(ctx: EventHandlerContext){
   let event
   const _event =  new FarmingPartiallyForceGaugeClaimedEvent(ctx)
-  if(_event.isV944) {
-    event = _event.asV944
+  if(_event.isV954) {
+    event = _event.asV954
   }
   return event;
 }
 export function formatFarmingAllRetiredEvent(ctx: EventHandlerContext){
   let event
   const _event =  new FarmingAllRetiredEvent(ctx)
-  if(_event.isV944) {
-    event = _event.asV944
+  if(_event.isV954) {
+    event = _event.asV954
   }
   return event;
 }
 export function formatFarmingPartiallyRetiredEvent(ctx: EventHandlerContext){
   let event
   const _event =  new FarmingPartiallyRetiredEvent(ctx)
-  if(_event.isV944) {
-    event = _event.asV944
+  if(_event.isV954) {
+    event = _event.asV954
   }
   return event;
 }
 export function formatFarmingRetireLimitSetEvent(ctx: EventHandlerContext){
   let event
   const _event =  new FarmingRetireLimitSetEvent(ctx)
-  if(_event.isV944) {
-    event = _event.asV944
+  if(_event.isV954) {
+    event = _event.asV954
   }
   return event;
 }
@@ -151,8 +152,8 @@ export async function getFamingPoolInfo(
   let result
 
   const farmingPoolInfoStorage = new FarmingPoolInfosStorage(ctx, ctx.block)
-  if (farmingPoolInfoStorage.isV944) {
-    result = await farmingPoolInfoStorage.asV944.get(pid)
+  if (farmingPoolInfoStorage.isV954) {
+    result = await farmingPoolInfoStorage.asV954.get(pid)
   } else if (farmingPoolInfoStorage.isV956) {
     result = await farmingPoolInfoStorage.asV956.get(pid)
   } else if (farmingPoolInfoStorage.isV962) {
@@ -171,8 +172,8 @@ export async function getFamingSharesAndWithdrawnRewards(
   let result
 
   const storage = new FarmingSharesAndWithdrawnRewardsStorage(ctx, ctx.block)
-  if (storage.isV944) {
-    result = await storage.asV944.get(pid, user)
+  if (storage.isV954) {
+    result = await storage.asV954.get(pid, user)
   } else if (storage.isV956) {
     result = await storage.asV956.get(pid, user)
   } else if (storage.isV962) {
@@ -208,7 +209,7 @@ export async function updateFarmingPoolInfo(
   const basicRewardPerDay = await Promise.all(farmingPoolInfo!.basicRewards.map(async (item) => {
     const assetIndex = currencyIdToAssetIndex(item[0]);
     const token = await getOrCreateToken(ctx, {
-      chainId: 2001,
+      chainId: CHAIN_ID,
       assetType: assetIndex === 0 ? 0 : 2,
       assetIndex: BigInt(assetIndex)
     });
@@ -225,7 +226,7 @@ export async function updateFarmingPoolInfo(
   const basicRewardEthPerDay = await Promise.all(farmingPoolInfo!.basicRewards.map(async (item) => {
     const assetIndex = currencyIdToAssetIndex(item[0]);
     const token = await getOrCreateToken(ctx, {
-      chainId: 2001,
+      chainId: CHAIN_ID,
       assetType: assetIndex === 0 ? 0 : 2,
       assetIndex: BigInt(assetIndex)
     });
@@ -250,8 +251,8 @@ export async function updateFarmingPoolInfo(
     const [token0Symbol, token0Id, token1Symbol, token1Id] = farmingToken.value
     const token0Index = parseToTokenIndex(token0Id, Number(invertedTokenSymbolMap[token0Symbol.__kind]))
     const token1Index = parseToTokenIndex(token1Id, Number(invertedTokenSymbolMap[token1Symbol.__kind]))
-    const asset0 = { chainId: 2001, assetType: token0Index === 0 ? 0 : 2, assetIndex: BigInt(token0Index) }
-    const asset1 = { chainId: 2001, assetType: token1Index === 0 ? 0 : 2, assetIndex: BigInt(token1Index) }
+    const asset0 = { chainId: CHAIN_ID, assetType: token0Index === 0 ? 0 : 2, assetIndex: BigInt(token0Index) }
+    const asset1 = { chainId: CHAIN_ID, assetType: token1Index === 0 ? 0 : 2, assetIndex: BigInt(token1Index) }
     let pair = await getPair(ctx, [asset0, asset1])
     if(pair) {
       await handleLiquiditySync(ctx, pair)
@@ -291,7 +292,7 @@ export async function updateFarmingPoolInfo(
     rewardUSDRate = rewardUSDPerDay.toFixed(6)
 
     const token = await getOrCreateToken(ctx, {
-      chainId: 2001,
+      chainId: CHAIN_ID,
       assetType: assetIdIndex === 0 ? 0 : 2,
       assetIndex: BigInt(assetIdIndex)
     });

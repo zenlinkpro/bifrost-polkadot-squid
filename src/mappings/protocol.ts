@@ -140,8 +140,8 @@ export async function handleLiquidityAdded(ctx: EventHandlerContext) {
   const mint = await ctx.store.get(Mint, mints[mints.length - 1])
   if (!mint) return
   const _event = new ZenlinkProtocolLiquidityAddedEvent(ctx, ctx.event)
-  if (_event.isV902) return
-  const event = _event.asV906
+  if (_event.isV954) return
+  const event = _event.asV954
 
   const [asset0, asset1] = sortAssets([event[1], event[2]])
 
@@ -204,8 +204,8 @@ export async function handleLiquidityRemoved(ctx: EventHandlerContext) {
   const burn = await ctx.store.get(Burn, burns[burns.length - 1])
   if (!burn) return
   const _event = new ZenlinkProtocolLiquidityRemovedEvent(ctx, ctx.event)
-  if (_event.isV902) return
-  const event = _event.asV906
+  if (_event.isV954) return
+  const event = _event.asV954
 
   const [asset0, asset1] = sortAssets([event[2], event[3]])
 
@@ -278,8 +278,8 @@ export async function handleAssetSwap(ctx: EventHandlerContext) {
   const txHash = ctx.event.extrinsic?.hash
   if (!txHash) return
   const _event = new ZenlinkProtocolAssetSwapEvent(ctx, ctx.event)
-  if (_event.isV902) return
-  const event = _event.asV906
+  if (_event.isV954) return
+  const event = _event.asV954
   const path = event[2]
   const amounts = event[3]
   const sender = codec(config.prefix).encode(event[0])
@@ -473,18 +473,12 @@ export async function handleTokensBalanceSet(ctx: EventHandlerContext) {
   let event;
 
   const _event = new TokensBalanceSetEvent(ctx, ctx.event)
-  if (_event.isV802) {
-    event = { currencyId: _event.asV802[0], who: _event.asV802[1], free: _event.asV802[2], reserved: _event.asV802[3] }
-  } else if (_event.isV906) {
-    event = { currencyId: _event.asV906[0], who: _event.asV906[1], free: _event.asV906[2], reserved: _event.asV906[3] }
-  } else if (_event.isV916) {
-    event = { currencyId: _event.asV916[0], who: _event.asV916[1], free: _event.asV916[2], reserved: _event.asV916[3] }
-  } else if (_event.isV920) {
-    event = { currencyId: _event.asV920[0], who: _event.asV920[1], free: _event.asV920[2], reserved: _event.asV920[3] }
-  } else if (_event.isV925) {
-    event = _event.asV925
-  } else if (_event.isV932) {
-    event = _event.asV932
+  if (_event.isV952) {
+    event = _event.asV952
+  } else if (_event.isV956) {
+    event = _event.asV956
+  } else if (_event.isV962) {
+    event = _event.asV962
   }
 
   if (

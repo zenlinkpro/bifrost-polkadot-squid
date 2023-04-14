@@ -1,11 +1,7 @@
 {
   "outDir": "../src/types",
-  "specVersions": "https://bifrost.archive.subsquid.io/graphql",
-  "typesBundle": "bifrost",
+  "specVersions": "https://bifrost-polkadot.archive.subsquid.io/graphql",
   "events": [
-    "Currencies.Transferred",
-    "Currencies.Deposited",
-    "Currencies.Withdrawn",
     "Farming.FarmingPoolCreated",
     "Farming.FarmingPoolReset",
     "Farming.FarmingPoolClosed",

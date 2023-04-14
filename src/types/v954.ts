@@ -42,6 +42,12 @@ export interface CurrencyId_ForeignAsset {
     value: number
 }
 
+export interface AssetId {
+    chainId: number
+    assetType: number
+    assetIndex: bigint
+}
+
 export interface GaugeInfo {
     who: Uint8Array
     gaugeAmount: bigint
@@ -68,12 +74,12 @@ export interface GaugePoolInfo {
     gaugeLastBlock: number
 }
 
-export interface Type_628 {
+export interface PoolInfo {
     tokensProportion: [CurrencyId, number][]
     totalShares: bigint
     basicRewards: [CurrencyId, bigint][]
     rewards: [CurrencyId, [bigint, bigint]][]
-    state: Type_634
+    state: PoolState
     keeper: Uint8Array
     rewardIssuer: Uint8Array
     gauge: (number | undefined)
@@ -91,6 +97,22 @@ export interface ShareInfo {
     withdrawnRewards: [CurrencyId, bigint][]
     claimLastBlock: number
     withdrawList: [number, bigint][]
+}
+
+export type PairStatus = PairStatus_Trading | PairStatus_Bootstrap | PairStatus_Disable
+
+export interface PairStatus_Trading {
+    __kind: 'Trading'
+    value: PairMetadata
+}
+
+export interface PairStatus_Bootstrap {
+    __kind: 'Bootstrap'
+    value: BootstrapParameter
+}
+
+export interface PairStatus_Disable {
+    __kind: 'Disable'
 }
 
 export type TokenSymbol = TokenSymbol_ASG | TokenSymbol_BNC | TokenSymbol_KUSD | TokenSymbol_DOT | TokenSymbol_KSM | TokenSymbol_ETH | TokenSymbol_KAR | TokenSymbol_ZLK | TokenSymbol_PHA | TokenSymbol_RMRK | TokenSymbol_MOVR
@@ -149,24 +171,37 @@ export interface GaugeState_Bonded {
     __kind: 'Bonded'
 }
 
-export type Type_634 = Type_634_UnCharged | Type_634_Charged | Type_634_Ongoing | Type_634_Dead | Type_634_Retired
+export type PoolState = PoolState_UnCharged | PoolState_Charged | PoolState_Ongoing | PoolState_Dead | PoolState_Retired
 
-export interface Type_634_UnCharged {
+export interface PoolState_UnCharged {
     __kind: 'UnCharged'
 }
 
-export interface Type_634_Charged {
+export interface PoolState_Charged {
     __kind: 'Charged'
 }
 
-export interface Type_634_Ongoing {
+export interface PoolState_Ongoing {
     __kind: 'Ongoing'
 }
 
-export interface Type_634_Dead {
+export interface PoolState_Dead {
     __kind: 'Dead'
 }
 
-export interface Type_634_Retired {
+export interface PoolState_Retired {
     __kind: 'Retired'
+}
+
+export interface PairMetadata {
+    pairAccount: Uint8Array
+    totalSupply: bigint
+}
+
+export interface BootstrapParameter {
+    targetSupply: [bigint, bigint]
+    capacitySupply: [bigint, bigint]
+    accumulatedSupply: [bigint, bigint]
+    endBlockNumber: number
+    pairAccount: Uint8Array
 }

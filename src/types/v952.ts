@@ -1,6 +1,6 @@
 import type {Result, Option} from './support'
 
-export type CurrencyId = CurrencyId_Native | CurrencyId_VToken | CurrencyId_Token | CurrencyId_Stable | CurrencyId_VSToken | CurrencyId_VSBond | CurrencyId_LPToken
+export type CurrencyId = CurrencyId_Native | CurrencyId_VToken | CurrencyId_Token | CurrencyId_Stable | CurrencyId_VSToken | CurrencyId_VSBond | CurrencyId_LPToken | CurrencyId_ForeignAsset
 
 export interface CurrencyId_Native {
     __kind: 'Native'
@@ -37,13 +37,18 @@ export interface CurrencyId_LPToken {
     value: [TokenSymbol, number, TokenSymbol, number]
 }
 
-export interface Type_454 {
+export interface CurrencyId_ForeignAsset {
+    __kind: 'ForeignAsset'
+    value: number
+}
+
+export interface Type_445 {
     free: bigint
     reserved: bigint
     frozen: bigint
 }
 
-export type TokenSymbol = TokenSymbol_ASG | TokenSymbol_BNC | TokenSymbol_KUSD | TokenSymbol_DOT | TokenSymbol_KSM | TokenSymbol_ETH | TokenSymbol_KAR | TokenSymbol_ZLK | TokenSymbol_PHA | TokenSymbol_RMRK
+export type TokenSymbol = TokenSymbol_ASG | TokenSymbol_BNC | TokenSymbol_KUSD | TokenSymbol_DOT | TokenSymbol_KSM | TokenSymbol_ETH | TokenSymbol_KAR | TokenSymbol_ZLK | TokenSymbol_PHA | TokenSymbol_RMRK | TokenSymbol_MOVR
 
 export interface TokenSymbol_ASG {
     __kind: 'ASG'
@@ -83,4 +88,8 @@ export interface TokenSymbol_PHA {
 
 export interface TokenSymbol_RMRK {
     __kind: 'RMRK'
+}
+
+export interface TokenSymbol_MOVR {
+    __kind: 'MOVR'
 }
