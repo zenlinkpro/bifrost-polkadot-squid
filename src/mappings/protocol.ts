@@ -140,7 +140,7 @@ export async function handleLiquidityAdded(ctx: EventHandlerContext) {
   const mint = await ctx.store.get(Mint, mints[mints.length - 1])
   if (!mint) return
   const _event = new ZenlinkProtocolLiquidityAddedEvent(ctx, ctx.event)
-  if (_event.isV954) return
+  if (!_event.isV954) return
   const event = _event.asV954
 
   const [asset0, asset1] = sortAssets([event[1], event[2]])
@@ -204,7 +204,7 @@ export async function handleLiquidityRemoved(ctx: EventHandlerContext) {
   const burn = await ctx.store.get(Burn, burns[burns.length - 1])
   if (!burn) return
   const _event = new ZenlinkProtocolLiquidityRemovedEvent(ctx, ctx.event)
-  if (_event.isV954) return
+  if (!_event.isV954) return
   const event = _event.asV954
 
   const [asset0, asset1] = sortAssets([event[2], event[3]])
@@ -277,8 +277,8 @@ export async function handleLiquidityRemoved(ctx: EventHandlerContext) {
 export async function handleAssetSwap(ctx: EventHandlerContext) {
   const txHash = ctx.event.extrinsic?.hash
   if (!txHash) return
-  const _event = new ZenlinkProtocolAssetSwapEvent(ctx, ctx.event)
-  if (_event.isV954) return
+  const _event = new ZenlinkProtocolAssetSwapEvent(ctx, ctx.event)  
+  if (!_event.isV954) return
   const event = _event.asV954
   const path = event[2]
   const amounts = event[3]

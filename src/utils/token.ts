@@ -16,6 +16,7 @@ import * as v952 from '../types/v952'
 import * as v956 from '../types/v956'
 import * as v962 from '../types/v962'
 import { CurrencyId, TokenSymbol } from "../types/v968";
+import { sortAssets } from './sort'
 
 export const currencyKeyMap: { [index: number]: string } = {
   0: 'Native',
@@ -171,8 +172,9 @@ const pairAssetIds = new Map<string, AssetId>()
 
 export async function getPairAssetIdFromAssets(
   ctx: EventHandlerContext,
-  assets: [AssetId, AssetId]
+  _assets: [AssetId, AssetId]
 ) {
+  const assets = sortAssets(_assets)
   const [asset0, asset1] = assets
   const token0Address = addressFromAsset(asset0)
   const token1Address = addressFromAsset(asset1)
