@@ -6,6 +6,9 @@ description: |-
 build:
 
 deploy:
+  secrets:
+    - BIFROST_POLKADOT_CHAIN_NODE
+    - SUBSCAN_API_KEY
   addons:
     postgres:
   processor:
