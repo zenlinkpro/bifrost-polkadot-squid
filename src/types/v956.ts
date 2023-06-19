@@ -83,12 +83,12 @@ export interface GaugePoolInfo {
     gaugeLastBlock: number
 }
 
-export interface Type_646 {
+export interface PoolInfo {
     tokensProportion: [CurrencyId, number][]
     totalShares: bigint
     basicRewards: [CurrencyId, bigint][]
     rewards: [CurrencyId, [bigint, bigint]][]
-    state: Type_652
+    state: PoolState
     keeper: Uint8Array
     rewardIssuer: Uint8Array
     gauge: (number | undefined)
@@ -108,7 +108,7 @@ export interface ShareInfo {
     withdrawList: [number, bigint][]
 }
 
-export interface Type_568 {
+export interface Type_526 {
     free: bigint
     reserved: bigint
     frozen: bigint
@@ -170,24 +170,24 @@ export interface GaugeState_Bonded {
     __kind: 'Bonded'
 }
 
-export type Type_652 = Type_652_UnCharged | Type_652_Charged | Type_652_Ongoing | Type_652_Dead | Type_652_Retired
+export type PoolState = PoolState_UnCharged | PoolState_Charged | PoolState_Ongoing | PoolState_Dead | PoolState_Retired
 
-export interface Type_652_UnCharged {
+export interface PoolState_UnCharged {
     __kind: 'UnCharged'
 }
 
-export interface Type_652_Charged {
+export interface PoolState_Charged {
     __kind: 'Charged'
 }
 
-export interface Type_652_Ongoing {
+export interface PoolState_Ongoing {
     __kind: 'Ongoing'
 }
 
-export interface Type_652_Dead {
+export interface PoolState_Dead {
     __kind: 'Dead'
 }
 
-export interface Type_652_Retired {
+export interface PoolState_Retired {
     __kind: 'Retired'
 }

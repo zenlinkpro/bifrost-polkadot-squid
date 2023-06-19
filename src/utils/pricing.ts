@@ -5,18 +5,18 @@ import { getOrCreateToken } from '../entities/token'
 import { Pair } from '../model'
 import { EventHandlerContext } from '../types'
 import { assetIdFromAddress } from './token'
+import { queryBundleBySubScan } from './nativeToken'
 
-export const WNATIVE = '2001-0-0'
-export const USDC = '2001-2-2048'
-export const KSM = '2001-2-516'
-export const aUSD = '2001-2-770'
-export const WNATIVE_USDC = '2001-2-8796093023744'
+export const WNATIVE = '2030-0-0'
+export const USDC = '2030-2-2050'
+export const DOT = '2030-2-2048'
+export const vDOT = '2030-2-2304'
+export const aUSD = '2030-2-770'
 
 export const WHITELIST: string[] = [
-  '2001-0-0', // wnative
-  '2001-2-2048', // usdc
-  '2001-2-519', // zlk
-  '2001-2-516' // ksm
+  WNATIVE, // wnative
+  DOT, // dot
+  vDOT, // vDOT
 ]
 
 // minimum liquidity required to count towards tracked volume for pairs with small # of Lps
@@ -26,25 +26,28 @@ export const MINIMUM_USD_THRESHOLD_NEW_PAIRS = new BigDecimal(1000)
 export const MINIMUM_LIQUIDITY_THRESHOLD_ETH = new BigDecimal(5)
 
 export async function getEthPriceInUSD(ctx: EventHandlerContext): Promise<BigDecimal> {
-  const usdcPair = await getPair(ctx, [assetIdFromAddress(WNATIVE), assetIdFromAddress(USDC)])
-  if (usdcPair) {
-    return usdcPair.token0.id === USDC
-      ? BigDecimal(usdcPair.token0Price)
-      : BigDecimal(usdcPair.token1Price)
-  }
+  const price =  await queryBundleBySubScan(ctx.block.timestamp);
 
-  // get ethprice from bnc-ksm > ksm-aUSD pair
-  const ksmPair = await getPair(ctx, [assetIdFromAddress(KSM), assetIdFromAddress(aUSD)])
-  const wnativePair = await getPair(ctx, [assetIdFromAddress(WNATIVE), assetIdFromAddress(KSM)])
-  if (ksmPair && wnativePair) {
-    const ksmPrice = ksmPair.token0.id === aUSD
-      ? BigDecimal(ksmPair.token0Price)
-      : BigDecimal(ksmPair.token1Price)
-    return wnativePair.token0.id === KSM
-      ? BigDecimal(wnativePair.token0Price).mul(ksmPrice)
-      : BigDecimal(wnativePair.token1Price).mul(ksmPrice)
-  }
-  return BigDecimal(0)
+  return BigDecimal(price)
+  // const usdcPair = await getPair(ctx, [assetIdFromAddress(WNATIVE), assetIdFromAddress(USDC)])
+  // if (usdcPair) {
+  //   return usdcPair.token0.id === USDC
+  //     ? BigDecimal(usdcPair.token0Price)
+  //     : BigDecimal(usdcPair.token1Price)
+  // }
+
+  // // get ethprice from bnc-dot > dot-usdt pair
+  // const ksmPair = await getPair(ctx, [assetIdFromAddress(DOT), assetIdFromAddress(USDC)])
+  // const wnativePair = await getPair(ctx, [assetIdFromAddress(WNATIVE), assetIdFromAddress(DOT)])
+  // if (ksmPair && wnativePair) {
+  //   const ksmPrice = ksmPair.token0.id === USDC
+  //     ? BigDecimal(ksmPair.token0Price)
+  //     : BigDecimal(ksmPair.token1Price)
+  //   return wnativePair.token0.id === DOT
+  //     ? BigDecimal(wnativePair.token0Price).mul(ksmPrice)
+  //     : BigDecimal(wnativePair.token1Price).mul(ksmPrice)
+  // }
+  // return BigDecimal(0)
 }
 
 

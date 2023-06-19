@@ -1,11 +1,14 @@
 manifestVersion: subsquid.io/v0.1
-name: zenlink-bifrost-kusama-squid
+name: zenlink-bifrost-polkadot-squid
 version: 3
 description: |-
-  Zenlink Bifrost(Kusama) Squid
+  Zenlink Bifrost(Polkadot) Squid
 build:
 
 deploy:
+  secrets:
+    - BIFROST_POLKADOT_CHAIN_NODE
+    - SUBSCAN_API_KEY
   addons:
     postgres:
   processor:

@@ -2,7 +2,7 @@ import { TOKEN_METADATA_MAP, ZERO_BD } from "../constants";
 import { Token } from "../model";
 import { EventHandlerContext } from "../types";
 import { AssetRegistryCurrencyMetadatasStorage } from "../types/storage";
-import { AssetId } from "../types/v906";
+import { AssetId } from "../types/v954";
 import { addressFromAsset, getTotalIssuance, u8a2s, zenlinkAssetIdToCurrencyId } from "../utils/token";
 import * as v956 from '../types/v956'
 import * as v962 from '../types/v962'
@@ -31,6 +31,9 @@ export async function getOrCreateToken(ctx: EventHandlerContext, asset: AssetId)
           name: u8a2s(result.name),
           decimals: result.decimals
         }
+      }
+      if(!metaddata) {
+        metaddata = TOKEN_METADATA_MAP[address]
       }
     }
 

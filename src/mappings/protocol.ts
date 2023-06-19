@@ -30,6 +30,7 @@ import {
   updateTokenDayData,
   updateZenlinkInfo
 } from "../utils/updates";
+import { getOrCreateToken } from "../entities/token";
 
 export async function handleLiquiditySync(ctx: EventHandlerContext, pair: Pair) {
   const bundle = (await ctx.store.get(Bundle, '1'))!
@@ -140,8 +141,8 @@ export async function handleLiquidityAdded(ctx: EventHandlerContext) {
   const mint = await ctx.store.get(Mint, mints[mints.length - 1])
   if (!mint) return
   const _event = new ZenlinkProtocolLiquidityAddedEvent(ctx, ctx.event)
-  if (_event.isV902) return
-  const event = _event.asV906
+  if (!_event.isV954) return
+  const event = _event.asV954
 
   const [asset0, asset1] = sortAssets([event[1], event[2]])
 
@@ -204,8 +205,8 @@ export async function handleLiquidityRemoved(ctx: EventHandlerContext) {
   const burn = await ctx.store.get(Burn, burns[burns.length - 1])
   if (!burn) return
   const _event = new ZenlinkProtocolLiquidityRemovedEvent(ctx, ctx.event)
-  if (_event.isV902) return
-  const event = _event.asV906
+  if (!_event.isV954) return
+  const event = _event.asV954
 
   const [asset0, asset1] = sortAssets([event[2], event[3]])
 
@@ -277,17 +278,18 @@ export async function handleLiquidityRemoved(ctx: EventHandlerContext) {
 export async function handleAssetSwap(ctx: EventHandlerContext) {
   const txHash = ctx.event.extrinsic?.hash
   if (!txHash) return
-  const _event = new ZenlinkProtocolAssetSwapEvent(ctx, ctx.event)
-  if (_event.isV902) return
-  const event = _event.asV906
+  const _event = new ZenlinkProtocolAssetSwapEvent(ctx, ctx.event)  
+  if (!_event.isV954) return
+  const event = _event.asV954
   const path = event[2]
   const amounts = event[3]
   const sender = codec(config.prefix).encode(event[0])
   const to = codec(config.prefix).encode(event[1])
 
   for (let i = 1; i < path.length; i++) {
-    const asset0 = path[i - 1]
-    const asset1 = path[i]
+    const inputAsset = path[i - 1]
+    const outputAsset = path[i]
+    const [asset0, asset1] = sortAssets([inputAsset, outputAsset])
 
     const pair = await getPair(ctx, [asset0, asset1])
 
@@ -299,13 +301,16 @@ export async function handleAssetSwap(ctx: EventHandlerContext) {
     const bundle = (await ctx.store.get(Bundle, '1'))!
 
     const { token0, token1 } = pair
+    const inputToken = await getOrCreateToken(ctx, inputAsset)
+    // const outputToken = await getOrCreateToken(ctx, outputAsset)
+    const [amount0, amount1] = inputToken?.id === token0.id ? [amounts[i - 1], amounts[i]] : [amounts[i], amounts[i - 1]]
 
-    const amount0In = convertTokenToDecimal(amounts[i - 1], token0.decimals)
-    const amount0Out = convertTokenToDecimal(0n, token0.decimals)
+    const amount0In = convertTokenToDecimal(amount0, token0.decimals)
+    const amount0Out = convertTokenToDecimal(0n, token1.decimals)
     const amount0Total = amount0Out.plus(amount0In)
 
     const amount1In = convertTokenToDecimal(0n, token1.decimals)
-    const amount1Out = convertTokenToDecimal(amounts[i], token1.decimals)
+    const amount1Out = convertTokenToDecimal(amount1, token1.decimals)
     const amount1Total = amount1Out.plus(amount1In)
 
     // get total amounts of derived USD and ETH for tracking
@@ -473,18 +478,12 @@ export async function handleTokensBalanceSet(ctx: EventHandlerContext) {
   let event;
 
   const _event = new TokensBalanceSetEvent(ctx, ctx.event)
-  if (_event.isV802) {
-    event = { currencyId: _event.asV802[0], who: _event.asV802[1], free: _event.asV802[2], reserved: _event.asV802[3] }
-  } else if (_event.isV906) {
-    event = { currencyId: _event.asV906[0], who: _event.asV906[1], free: _event.asV906[2], reserved: _event.asV906[3] }
-  } else if (_event.isV916) {
-    event = { currencyId: _event.asV916[0], who: _event.asV916[1], free: _event.asV916[2], reserved: _event.asV916[3] }
-  } else if (_event.isV920) {
-    event = { currencyId: _event.asV920[0], who: _event.asV920[1], free: _event.asV920[2], reserved: _event.asV920[3] }
-  } else if (_event.isV925) {
-    event = _event.asV925
-  } else if (_event.isV932) {
-    event = _event.asV932
+  if (_event.isV952) {
+    event = _event.asV952
+  } else if (_event.isV956) {
+    event = _event.asV956
+  } else if (_event.isV962) {
+    event = _event.asV962
   }
 
   if (
