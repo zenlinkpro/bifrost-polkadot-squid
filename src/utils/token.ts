@@ -232,6 +232,8 @@ export async function getTokenBalance(
     const systemAccountStorate = new SystemAccountStorage(ctx, ctx.block)
     if(systemAccountStorate.isV932) {
       result = (await systemAccountStorate.asV932.get(account)).data
+    } else if(systemAccountStorate.isV978) {
+      result = (await systemAccountStorate.asV978.get(account)).data
     }
   } else {
     const tokenAccountsStorage = new TokensAccountsStorage(ctx, ctx.block)
@@ -282,6 +284,8 @@ export async function getTokenBurned(
     const systemAccountStorate = new SystemAccountStorage(ctx, block)
     if(systemAccountStorate.isV932) {
       result = (await systemAccountStorate.asV932.get(account)).data
+    } else if(systemAccountStorate.isV978) {
+      result = (await systemAccountStorate.asV978.get(account)).data
     }
   } else {
     const tokenAccountsStorage = new TokensAccountsStorage(ctx, block)
