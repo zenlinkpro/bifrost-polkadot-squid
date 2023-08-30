@@ -183,6 +183,8 @@ export async function getFamingSharesAndWithdrawnRewards(
     result = await storage.asV956.get(pid, user)
   } else if (storage.isV962) {
     result = await storage.asV962.get(pid, user)
+  } else if (storage.isV980) {
+    result = await storage.asV980.get(pid, user)
   }
   return result
 }

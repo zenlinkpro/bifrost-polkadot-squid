@@ -15,6 +15,7 @@ import * as v932 from '../types/v932'
 import * as v952 from '../types/v952'
 import * as v956 from '../types/v956'
 import * as v962 from '../types/v962'
+import * as v980 from '../types/v962'
 import { CurrencyId, TokenSymbol } from "../types/v980";
 import { sortAssets } from './sort'
 
@@ -243,9 +244,11 @@ export async function getTokenBalance(
       result = await tokenAccountsStorage.asV952.get(account, assetId as v952.CurrencyId)
     } else if (tokenAccountsStorage.isV956) {
       result = await tokenAccountsStorage.asV956.get(account, assetId as v956.CurrencyId)
-    } else if (tokenAccountsStorage.isV962) (
+    } else if (tokenAccountsStorage.isV962) {
       result = await tokenAccountsStorage.asV962.get(account, assetId as v962.CurrencyId)
-    )
+    } else if (tokenAccountsStorage.isV980) {
+      result = await tokenAccountsStorage.asV980.get(account, assetId as v980.CurrencyId)
+    }
   }
 
   return result?.free
@@ -264,9 +267,11 @@ export async function getTotalIssuance(ctx: EventHandlerContext, assetId: v962.C
       result = await tokenIssuanceStorage.asV952.get(assetId as v952.CurrencyId)
     } else if (tokenIssuanceStorage.isV956) {
       result = await tokenIssuanceStorage.asV956.get(assetId as v956.CurrencyId)
-    } else if (tokenIssuanceStorage.isV962) (
+    } else if (tokenIssuanceStorage.isV962) {
       result = await tokenIssuanceStorage.asV962.get(assetId as v962.CurrencyId)
-    )
+    } else if (tokenIssuanceStorage.isV980) {
+      result = await tokenIssuanceStorage.asV980.get(assetId as v962.CurrencyId)
+    }
   }
 
   return result
@@ -295,9 +300,11 @@ export async function getTokenBurned(
       result = await tokenAccountsStorage.asV952.get(account, assetId as v952.CurrencyId)
     } else if (tokenAccountsStorage.isV956) {
       result = await tokenAccountsStorage.asV956.get(account, assetId as v956.CurrencyId)
-    } else if (tokenAccountsStorage.isV962) (
+    } else if (tokenAccountsStorage.isV962) {
       result = await tokenAccountsStorage.asV962.get(account, assetId as v962.CurrencyId)
-    )
+    } else if (tokenAccountsStorage.isV980) {
+      result = await tokenAccountsStorage.asV980.get(account, assetId as v962.CurrencyId)
+    }
   }
 
   return result?.free
