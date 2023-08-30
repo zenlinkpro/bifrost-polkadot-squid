@@ -163,6 +163,8 @@ export async function getFamingPoolInfo(
     result = await farmingPoolInfoStorage.asV962.get(pid)
   } else if (farmingPoolInfoStorage.isV968) {
     result = await farmingPoolInfoStorage.asV968.get(pid)
+  } else if (farmingPoolInfoStorage.isV980) {
+    result = await farmingPoolInfoStorage.asV980.get(pid)
   }
   return result
 }

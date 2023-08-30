@@ -15,7 +15,7 @@ import * as v932 from '../types/v932'
 import * as v952 from '../types/v952'
 import * as v956 from '../types/v956'
 import * as v962 from '../types/v962'
-import { CurrencyId, TokenSymbol } from "../types/v968";
+import { CurrencyId, TokenSymbol } from "../types/v980";
 import { sortAssets } from './sort'
 
 export const currencyKeyMap: { [index: number]: string } = {
@@ -31,7 +31,8 @@ export const currencyKeyMap: { [index: number]: string } = {
   9: 'VToken2',
   10: 'VSToken2',
   11: 'VSBond2',
-  12: 'StableLpToken'
+  12: 'StableLpToken',
+  13: 'BLP'
 };
 
 export enum CurrencyTypeEnum {
@@ -48,6 +49,7 @@ export enum CurrencyTypeEnum {
   VSToken2 = 10,
   VSBond2 = 11, 
   StableLpToken = 12,
+  BLP = 13
 };
 
 export enum CurrencyIndexEnum {
