@@ -478,12 +478,17 @@ export async function handleTokensBalanceSet(ctx: EventHandlerContext) {
   let event;
 
   const _event = new TokensBalanceSetEvent(ctx, ctx.event)
-  if (_event.isV952) {
-    event = _event.asV952
-  } else if (_event.isV956) {
-    event = _event.asV956
-  } else if (_event.isV962) {
-    event = _event.asV962
+  switch (true) {
+    case _event.isV952:
+      event = _event.asV952
+    case _event.isV956:
+      event = _event.asV956
+    case _event.isV962:
+      event = _event.asV962
+    case _event.isV980:
+      event = _event.asV980
+    case _event.isV990:
+      event = _event.asV990
   }
 
   if (
