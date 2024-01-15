@@ -1,13 +1,13 @@
 import { ProcessorConfig } from "./types";
 import {lookupArchive} from "@subsquid/archive-registry"
 
-export const CHAIN_NODE = process.env.BIFROST_POLKADOT_CHAIN_NODE || 'wss://bifrost-polkadot.api.onfinality.io/public-ws'
+export const CHAIN_NODE = process.env.BIFROST_POLKADOT_CHAIN_NODE || 'wss://hk.p.bifrost-rpc.liebi.com/ws'
 
 export const config: ProcessorConfig = {
   chainName: 'bifrost',
   prefix: 'bifrost',
   dataSource: {
-    archive: lookupArchive('bifrost-polkadot', {type: "Substrate"} ),
+    archive: lookupArchive('bifrost-polkadot'),
     chain: CHAIN_NODE,
   },
 }
