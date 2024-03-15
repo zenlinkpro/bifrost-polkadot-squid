@@ -1,7 +1,7 @@
 import { ProcessorConfig } from "./types";
 import {lookupArchive} from "@subsquid/archive-registry"
 
-export const CHAIN_NODE = process.env.BIFROST_POLKADOT_CHAIN_NODE || 'wss://hk.p.bifrost-rpc.liebi.com/ws'
+export const CHAIN_NODE = process.env.BIFROST_POLKADOT_CHAIN_NODE || 'wss://bifrost-polkadot-rpc.dwellir.com'
 
 export const config: ProcessorConfig = {
   chainName: 'bifrost',
