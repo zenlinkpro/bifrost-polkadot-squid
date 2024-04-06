@@ -1,11 +1,10 @@
 import { Big as BigDecimal } from 'big.js'
 import { ONE_BD, ZERO_BD } from '../constants'
-import { getPair } from '../entities/pair'
 import { getOrCreateToken } from '../entities/token'
 import { Pair } from '../model'
-import { EventHandlerContext } from '../types'
 import { assetIdFromAddress } from './token'
 import { queryBundleBySubScan } from './nativeToken'
+import { EventContext } from '../processor'
 
 export const WNATIVE = '2030-0-0'
 export const USDC = '2030-2-2050'
@@ -25,8 +24,8 @@ export const MINIMUM_USD_THRESHOLD_NEW_PAIRS = new BigDecimal(1000)
 // minimum liquidity for price to get tracked
 export const MINIMUM_LIQUIDITY_THRESHOLD_ETH = new BigDecimal(5)
 
-export async function getEthPriceInUSD(ctx: EventHandlerContext): Promise<BigDecimal> {
-  const price =  await queryBundleBySubScan(ctx.block.timestamp);
+export async function getEthPriceInUSD(ctx: EventContext): Promise<BigDecimal> {
+  const price = await queryBundleBySubScan(ctx.block.timestamp!);
 
   return BigDecimal(price)
   // const usdcPair = await getPair(ctx, [assetIdFromAddress(WNATIVE), assetIdFromAddress(USDC)])
@@ -56,7 +55,7 @@ export async function getEthPriceInUSD(ctx: EventHandlerContext): Promise<BigDec
  * @todo update to be derived ETH (plus stablecoin estimates)
  * */
 export async function findEthPerToken(
-  ctx: EventHandlerContext,
+  ctx: EventContext,
   tokenId: string
 ): Promise<BigDecimal> {
   if (tokenId === WNATIVE) {

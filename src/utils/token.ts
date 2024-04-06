@@ -1,12 +1,3 @@
-import { EventHandlerContext } from "../types";
-import {
-  BalancesTotalIssuanceStorage,
-  SystemAccountStorage,
-  TokensAccountsStorage,
-  TokensTotalIssuanceStorage,
-  ZenlinkProtocolLiquidityPairsStorage,
-  ZenlinkProtocolPairStatusesStorage
-} from "../types/storage";
 import { AssetId } from "../types/v954";
 import { codec } from '@subsquid/ss58'
 import { config } from "../config";
@@ -18,6 +9,11 @@ import * as v980 from '../types/v962'
 import * as v990 from '../types/v990'
 import { CurrencyId, TokenSymbol } from "../types/v990";
 import { sortAssets } from './sort'
+import { EventContext } from "../processor";
+import { liquidityPairs, pairStatuses } from "../types/zenlink-protocol/storage";
+import { account as systemAccount } from "../types/system/storage"
+import { accounts as tokenAccounts, totalIssuance as tokenTotalIssuance } from "../types/tokens/storage"
+import { totalIssuance as balanceTotalIssuance } from "../types/balances/storage"
 
 export const currencyKeyMap: { [index: number]: string } = {
   0: 'Native',
@@ -49,7 +45,7 @@ export enum CurrencyTypeEnum {
   Token2 = 8,
   VToken2 = 9,
   VSToken2 = 10,
-  VSBond2 = 11, 
+  VSBond2 = 11,
   StableLpToken = 12,
   BLP = 13,
   Lend = 14
@@ -114,7 +110,7 @@ export function parseTokenType(assetIndex: number): string {
   return currencyKeyMap[assetU8]
 }
 
-export function zenlinkAssetIdToCurrencyId(asset: AssetId): any  {
+export function zenlinkAssetIdToCurrencyId(asset: AssetId): any {
   const assetIndex = Number(asset.assetIndex.toString())
   const assetU8 = ((assetIndex & 0x0000_0000_0000_ff00) >> 8)
   const tokenType = parseTokenType(assetIndex)
@@ -137,11 +133,11 @@ export function zenlinkAssetIdToCurrencyId(asset: AssetId): any  {
   }
 }
 
-export function currencyIdToAssetIndex(currency: CurrencyId): number  {
+export function currencyIdToAssetIndex(currency: CurrencyId): number {
   const tokenType = CurrencyTypeEnum[currency.__kind]
   let tokenIndex;
 
-  if(TokenIndexMap[tokenType]) {
+  if (TokenIndexMap[tokenType]) {
     tokenIndex = currency.value as number
   } else {
     tokenIndex = CurrencyIndexEnum[((currency.value) as TokenSymbol).__kind]
@@ -178,7 +174,7 @@ export function parseToTokenIndex(type: number, index: number): number {
 const pairAssetIds = new Map<string, AssetId>()
 
 export async function getPairAssetIdFromAssets(
-  ctx: EventHandlerContext,
+  ctx: EventContext,
   _assets: [AssetId, AssetId]
 ) {
   const assets = sortAssets(_assets)
@@ -190,9 +186,9 @@ export async function getPairAssetIdFromAssets(
   if (pairAssetIds.has(assetsId)) {
     pairAssetId = pairAssetIds.get(assetsId)
   } else {
-    const pairsStorage = new ZenlinkProtocolLiquidityPairsStorage(ctx, ctx.block)
-    if (!pairsStorage.isExists) return undefined
-    pairAssetId = await pairsStorage.asV954.get(assets)
+    const pairsStorage = liquidityPairs.v954
+    if (!pairsStorage.is(ctx.block)) return undefined
+    pairAssetId = await pairsStorage.get(ctx.block, assets)
     if (pairAssetId) {
       pairAssetIds.set(assetsId, pairAssetId)
     }
@@ -203,7 +199,7 @@ export async function getPairAssetIdFromAssets(
 const pairAccounts = new Map<string, string>()
 
 export async function getPairStatusFromAssets(
-  ctx: EventHandlerContext,
+  ctx: EventContext,
   assets: [AssetId, AssetId],
   onlyAccount = true
 ): Promise<[string | undefined, BigInt]> {
@@ -216,10 +212,10 @@ export async function getPairStatusFromAssets(
     pairAccount = pairAccounts.get(assetsId)
     return [pairAccount!, BigInt(0)]
   } else {
-    const statusStorage = new ZenlinkProtocolPairStatusesStorage(ctx, ctx.block)
-    if (!statusStorage.isExists) return [undefined, BigInt(0)]
-    const result = await statusStorage.asV954.get(assets)
-    if (result.__kind === 'Trading') {
+    const statusStorage = pairStatuses.v954
+    if (!statusStorage.is(ctx.block)) return [undefined, BigInt(0)]
+    const result = await statusStorage.get(ctx.block, assets)
+    if (result?.__kind === 'Trading') {
       pairAccount = codec(config.prefix).encode(result.value.pairAccount)
       pairAccounts.set(assetsId, pairAccount)
       return [pairAccount, result.value.totalSupply]
@@ -230,55 +226,71 @@ export async function getPairStatusFromAssets(
 }
 
 export async function getTokenBalance(
-  ctx: EventHandlerContext,
+  ctx: EventContext,
   assetId: v962.CurrencyId,
-  account: Uint8Array
+  account: string
 ) {
   let result
   if (assetId.__kind === 'Native') {
-    const systemAccountStorate = new SystemAccountStorage(ctx, ctx.block)
-    if(systemAccountStorate.isV932) {
-      result = (await systemAccountStorate.asV932.get(account)).data
-    } else if(systemAccountStorate.isV978) {
-      result = (await systemAccountStorate.asV978.get(account)).data
+    if (systemAccount.v932.is(ctx.block)) {
+      result = (await systemAccount.v932.get(ctx.block, account))?.data
+    }
+    else if (systemAccount.v978.is(ctx.block)) {
+      result = (await systemAccount.v978.get(ctx.block, account))?.data
+    } else {
+      throw new Error('Unsupported spec')
     }
   } else {
-    const tokenAccountsStorage = new TokensAccountsStorage(ctx, ctx.block)
-    if (tokenAccountsStorage.isV952) {
-      result = await tokenAccountsStorage.asV952.get(account, assetId as v952.CurrencyId)
-    } else if (tokenAccountsStorage.isV956) {
-      result = await tokenAccountsStorage.asV956.get(account, assetId as v956.CurrencyId)
-    } else if (tokenAccountsStorage.isV962) {
-      result = await tokenAccountsStorage.asV962.get(account, assetId as v962.CurrencyId)
-    } else if (tokenAccountsStorage.isV980) {
-      result = await tokenAccountsStorage.asV980.get(account, assetId as v980.CurrencyId)
-    } else if (tokenAccountsStorage.isV990) {
-      result = await tokenAccountsStorage.asV990.get(account, assetId as v990.CurrencyId)
+    if (tokenAccounts.v952.is(ctx.block)) {
+      result = await tokenAccounts.v952.get(ctx.block, account, assetId as v952.CurrencyId)
+    }
+    else if (tokenAccounts.v956.is(ctx.block)) {
+      result = await tokenAccounts.v956.get(ctx.block, account, assetId as v956.CurrencyId)
+    }
+    else if (tokenAccounts.v962.is(ctx.block)) {
+      result = await tokenAccounts.v962.get(ctx.block, account, assetId as v962.CurrencyId)
+    }
+    else if (tokenAccounts.v980.is(ctx.block)) {
+      result = await tokenAccounts.v980.get(ctx.block, account, assetId as v980.CurrencyId)
+    }
+    else if (tokenAccounts.v990.is(ctx.block)) {
+      result = await tokenAccounts.v990.get(ctx.block, account, assetId as v990.CurrencyId)
+    }
+    else {
+      throw new Error('Unsupported spec')
     }
   }
 
   return result?.free
 }
 
-export async function getTotalIssuance(ctx: EventHandlerContext, assetId: v962.CurrencyId) {
+export async function getTotalIssuance(ctx: EventContext, assetId: v962.CurrencyId) {
   let result
   if (assetId.__kind === 'Native') {
-    const balanceIssuanceStorage = new BalancesTotalIssuanceStorage(ctx, ctx.block)
-    if(balanceIssuanceStorage.isV932) {
-      result = await balanceIssuanceStorage.asV932.get()
+    if (balanceTotalIssuance.v932.is(ctx.block)) {
+      result = await balanceTotalIssuance.v932.get(ctx.block)
+    }
+    else {
+      throw new Error('Unsupported spec')
     }
   } else {
-    const tokenIssuanceStorage = new TokensTotalIssuanceStorage(ctx, ctx.block)
-    if (tokenIssuanceStorage.isV952) {
-      result = await tokenIssuanceStorage.asV952.get(assetId as v952.CurrencyId)
-    } else if (tokenIssuanceStorage.isV956) {
-      result = await tokenIssuanceStorage.asV956.get(assetId as v956.CurrencyId)
-    } else if (tokenIssuanceStorage.isV962) {
-      result = await tokenIssuanceStorage.asV962.get(assetId as v962.CurrencyId)
-    } else if (tokenIssuanceStorage.isV980) {
-      result = await tokenIssuanceStorage.asV980.get(assetId as v980.CurrencyId)
-    } else if (tokenIssuanceStorage.isV990) {
-      result = await tokenIssuanceStorage.asV990.get(assetId as v990.CurrencyId)
+    if (tokenTotalIssuance.v952.is(ctx.block)) {
+      result = await tokenTotalIssuance.v952.get(ctx.block, assetId as v952.CurrencyId)
+    }
+    else if (tokenTotalIssuance.v956.is(ctx.block)) {
+      result = await tokenTotalIssuance.v956.get(ctx.block, assetId as v956.CurrencyId)
+    }
+    else if (tokenTotalIssuance.v962.is(ctx.block)) {
+      result = await tokenTotalIssuance.v962.get(ctx.block, assetId as v962.CurrencyId)
+    }
+    else if (tokenTotalIssuance.v980.is(ctx.block)) {
+      result = await tokenTotalIssuance.v980.get(ctx.block, assetId as v980.CurrencyId)
+    }
+    else if (tokenTotalIssuance.v990.is(ctx.block)) {
+      result = await tokenTotalIssuance.v990.get(ctx.block, assetId as v990.CurrencyId)
+    }
+    else {
+      throw new Error('Unsupported spec')
     }
   }
 
@@ -287,33 +299,40 @@ export async function getTotalIssuance(ctx: EventHandlerContext, assetId: v962.C
 
 
 export async function getTokenBurned(
-  ctx: EventHandlerContext,
+  ctx: EventContext,
   assetId: v962.CurrencyId,
-  account: Uint8Array
+  account: string
 ) {
-  let block = {
-    hash: ctx.block.parentHash
-  }
+  let block = ctx.block.getParent()
   let result
   if (assetId.__kind === 'Native') {
-    const systemAccountStorate = new SystemAccountStorage(ctx, block)
-    if(systemAccountStorate.isV932) {
-      result = (await systemAccountStorate.asV932.get(account)).data
-    } else if(systemAccountStorate.isV978) {
-      result = (await systemAccountStorate.asV978.get(account)).data
+    if (systemAccount.v932.is(block)) {
+      result = (await systemAccount.v932.get(block, account))?.data
+    }
+    else if (systemAccount.v978.is(block)) {
+      result = (await systemAccount.v978.get(block, account))?.data
+    }
+    else {
+      throw new Error('Unsupported spec')
     }
   } else {
-    const tokenAccountsStorage = new TokensAccountsStorage(ctx, block)
-    if (tokenAccountsStorage.isV952) {
-      result = await tokenAccountsStorage.asV952.get(account, assetId as v952.CurrencyId)
-    } else if (tokenAccountsStorage.isV956) {
-      result = await tokenAccountsStorage.asV956.get(account, assetId as v956.CurrencyId)
-    } else if (tokenAccountsStorage.isV962) {
-      result = await tokenAccountsStorage.asV962.get(account, assetId as v962.CurrencyId)
-    } else if (tokenAccountsStorage.isV980) {
-      result = await tokenAccountsStorage.asV980.get(account, assetId as v980.CurrencyId)
-    } else if (tokenAccountsStorage.isV990) {
-      result = await tokenAccountsStorage.asV990.get(account, assetId as v990.CurrencyId)
+    if (tokenAccounts.v952.is(block)) {
+      result = await tokenAccounts.v952.get(block, account, assetId as v952.CurrencyId)
+    }
+    else if (tokenAccounts.v956.is(block)) {
+      result = await tokenAccounts.v956.get(block, account, assetId as v956.CurrencyId)
+    }
+    else if (tokenAccounts.v962.is(block)) {
+      result = await tokenAccounts.v962.get(block, account, assetId as v962.CurrencyId)
+    }
+    else if (tokenAccounts.v980.is(block)) {
+      result = await tokenAccounts.v980.get(block, account, assetId as v980.CurrencyId)
+    }
+    else if (tokenAccounts.v990.is(block)) {
+      result = await tokenAccounts.v990.get(block, account, assetId as v990.CurrencyId)
+    }
+    else {
+      throw new Error('Unsupported spec')
     }
   }
 

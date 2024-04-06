@@ -1,6 +1,6 @@
 {
   "outDir": "../src/types",
-  "specVersions": "https://bifrost-polkadot.archive.subsquid.io/graphql",
+  "specVersions": "https://v2.archive.subsquid.io/metadata/bifrost-polkadot",
   "events": [
     "Farming.FarmingPoolCreated",
     "Farming.FarmingPoolReset",
@@ -18,8 +18,6 @@
     "Farming.AllRetired",
     "Farming.PartiallyRetired",
     "Farming.RetireLimitSet",
-
-
     "Tokens.Transfer",
     "Tokens.Deposited",
     "Tokens.Withdrawn",

@@ -1,6 +1,6 @@
 manifestVersion: subsquid.io/v0.1
 name: zenlink-bifrost-polkadot
-version: 3
+version: 4
 description: |-
   Zenlink Bifrost(Polkadot) Squid
 build:

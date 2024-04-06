@@ -4,197 +4,222 @@ import { getOrCreateToken } from "../entities/token";
 import { updateSingleTokenLockDayData, updateSingleTokenLockHourData } from "../mappings/farming/update";
 import { handleLiquiditySync } from "../mappings/protocol";
 import { Bundle, Farm, Incentive, SingleTokenLock } from "../model";
-import { EventHandlerContext } from "../types"
-import { FarmingAllForceGaugeClaimedEvent, FarmingAllRetiredEvent, FarmingChargedEvent, FarmingClaimedEvent, FarmingDepositedEvent, FarmingFarmingPoolClosedEvent, FarmingFarmingPoolCreatedEvent, FarmingFarmingPoolEditedEvent, FarmingFarmingPoolKilledEvent, FarmingFarmingPoolResetEvent, FarmingGaugeWithdrawnEvent, FarmingPartiallyForceGaugeClaimedEvent, FarmingPartiallyRetiredEvent, FarmingRetireLimitSetEvent, FarmingWithdrawClaimedEvent, FarmingWithdrawnEvent } from "../types/events"
-import { FarmingPoolInfosStorage, FarmingSharesAndWithdrawnRewardsStorage } from "../types/storage"
+import { EventContext } from "../processor";
 import { convertTokenToDecimal, getTimePerBlock } from "./helpers";
 import { currencyIdToAssetIndex, invertedTokenSymbolMap, parseToTokenIndex } from "./token";
+import {
+  allForceGaugeClaimed,
+  allRetired,
+  charged,
+  claimed,
+  deposited,
+  farmingPoolClosed,
+  farmingPoolCreated,
+  farmingPoolEdited,
+  farmingPoolKilled,
+  farmingPoolReset,
+  gaugeWithdrawn,
+  partiallyForceGaugeClaimed,
+  partiallyRetired,
+  retireLimitSet,
+  withdrawClaimed,
+  withdrawn
+} from "../types/farming/events"
+import { poolInfos, sharesAndWithdrawnRewards } from "../types/farming/storage";
+import { ParentBlockHeader } from "@subsquid/substrate-processor";
 
-export function formatFarmingCreatedPoolEvent(ctx: EventHandlerContext) {
+export function formatFarmingCreatedPoolEvent(ctx: EventContext) {
   let event
-  const _event = new FarmingFarmingPoolCreatedEvent(ctx)
-  if (_event.isV954) {
-    event = _event.asV954
-  }
-  return event;
-}
-
-export function formatFarmingPoolResetEvent(ctx: EventHandlerContext) {
-  let event
-  const _event = new FarmingFarmingPoolResetEvent(ctx)
-  if (_event.isV954) {
-    event = _event.asV954
-  }
-  return event;
-}
-
-export function formatFarmingPoolClosedEvent(ctx: EventHandlerContext) {
-  let event
-  const _event = new FarmingFarmingPoolClosedEvent(ctx)
-  if (_event.isV954) {
-    event = _event.asV954
-  }
-  return event;
-}
-
-export function formatFarmingPoolKilledEvent(ctx: EventHandlerContext) {
-  let event
-  const _event = new FarmingFarmingPoolKilledEvent(ctx)
-  if (_event.isV954) {
-    event = _event.asV954
+  if (farmingPoolCreated.v954.is(ctx.event)) {
+    event = farmingPoolCreated.v954.decode(ctx.event)
   }
   return event;
 }
 
-export function formatFarmingPoolEditedEvent(ctx: EventHandlerContext) {
+export function formatFarmingPoolResetEvent(ctx: EventContext) {
   let event
-  const _event = new FarmingFarmingPoolEditedEvent(ctx)
-  if (_event.isV954) {
-    event = _event.asV954
+  if (farmingPoolReset.v954.is(ctx.event)) {
+    event = farmingPoolReset.v954.decode(ctx.event)
   }
   return event;
 }
 
-export function formatFarmingChargedEvent(ctx: EventHandlerContext) {
+export function formatFarmingPoolClosedEvent(ctx: EventContext) {
   let event
-  const _event = new FarmingChargedEvent(ctx)
-  if (_event.isV954) {
-    event = _event.asV954
+  if (farmingPoolClosed.v954.is(ctx.event)) {
+    event = farmingPoolClosed.v954.decode(ctx.event)
   }
   return event;
 }
 
-export function formatFarmingDepositedEvent(ctx: EventHandlerContext) {
+export function formatFarmingPoolKilledEvent(ctx: EventContext) {
   let event
-  const _event = new FarmingDepositedEvent(ctx)
-  if (_event.isV954) {
-    event = _event.asV954
+  if (farmingPoolKilled.v954.is(ctx.event)) {
+    event = farmingPoolKilled.v954.decode(ctx.event)
   }
   return event;
 }
-export function formatFarmingWithdrawnEvent(ctx: EventHandlerContext) {
+
+export function formatFarmingPoolEditedEvent(ctx: EventContext) {
   let event
-  const _event = new FarmingWithdrawnEvent(ctx)
-  if (_event.isV954) {
-    event = _event.asV954
-  }
-  return event;
-} export function formatFarmingClaimedEvent(ctx: EventHandlerContext) {
-  let event
-  const _event = new FarmingClaimedEvent(ctx)
-  if (_event.isV954) {
-    event = _event.asV954
+  if (farmingPoolEdited.v954.is(ctx.event)) {
+    event = farmingPoolEdited.v954.decode(ctx.event)
   }
   return event;
 }
-export function formatFarmingWithdrawClaimedEvent(ctx: EventHandlerContext) {
+
+export function formatFarmingChargedEvent(ctx: EventContext) {
   let event
-  const _event = new FarmingWithdrawClaimedEvent(ctx)
-  if (_event.isV954) {
-    event = _event.asV954
+  if (charged.v954.is(ctx.event)) {
+    event = charged.v954.decode(ctx.event)
+  }
+  else if (charged.v956.is(ctx.event)) {
+    event = charged.v956.decode(ctx.event)
+  }
+  else if (charged.v962.is(ctx.event)) {
+    event = charged.v962.decode(ctx.event)
+  }
+  else if (charged.v980.is(ctx.event)) {
+    event = charged.v980.decode(ctx.event)
+  }
+  else if (charged.v990.is(ctx.event)) {
+    event = charged.v990.decode(ctx.event)
   }
   return event;
 }
-export function formatFarmingGaugeWithdrawnEvent(ctx: EventHandlerContext) {
+
+export function formatFarmingDepositedEvent(ctx: EventContext) {
   let event
-  const _event = new FarmingGaugeWithdrawnEvent(ctx)
-  if (_event.isV954) {
-    event = _event.asV954
+  if (deposited.v954.is(ctx.event)) {
+    event = deposited.v954.decode(ctx.event)
   }
   return event;
 }
-export function formatFarmingAllForceGaugeClaimedEvent(ctx: EventHandlerContext) {
+export function formatFarmingWithdrawnEvent(ctx: EventContext) {
   let event
-  const _event = new FarmingAllForceGaugeClaimedEvent(ctx)
-  if (_event.isV954) {
-    event = _event.asV954
+  if (withdrawn.v954.is(ctx.event)) {
+    event = withdrawn.v954.decode(ctx.event)
   }
   return event;
 }
-export function formatFarmingPartiallyForceGaugeClaimedEvent(ctx: EventHandlerContext) {
+export function formatFarmingClaimedEvent(ctx: EventContext) {
   let event
-  const _event = new FarmingPartiallyForceGaugeClaimedEvent(ctx)
-  if (_event.isV954) {
-    event = _event.asV954
+  if (claimed.v954.is(ctx.event)) {
+    event = claimed.v954.decode(ctx.event)
   }
   return event;
 }
-export function formatFarmingAllRetiredEvent(ctx: EventHandlerContext) {
+export function formatFarmingWithdrawClaimedEvent(ctx: EventContext) {
   let event
-  const _event = new FarmingAllRetiredEvent(ctx)
-  if (_event.isV954) {
-    event = _event.asV954
+  if (withdrawClaimed.v954.is(ctx.event)) {
+    event = withdrawClaimed.v954.decode(ctx.event)
   }
   return event;
 }
-export function formatFarmingPartiallyRetiredEvent(ctx: EventHandlerContext) {
+export function formatFarmingGaugeWithdrawnEvent(ctx: EventContext) {
   let event
-  const _event = new FarmingPartiallyRetiredEvent(ctx)
-  if (_event.isV954) {
-    event = _event.asV954
+  if (gaugeWithdrawn.v954.is(ctx.event)) {
+    event = gaugeWithdrawn.v954.decode(ctx.event)
   }
   return event;
 }
-export function formatFarmingRetireLimitSetEvent(ctx: EventHandlerContext) {
+export function formatFarmingAllForceGaugeClaimedEvent(ctx: EventContext) {
   let event
-  const _event = new FarmingRetireLimitSetEvent(ctx)
-  if (_event.isV954) {
-    event = _event.asV954
+  if (allForceGaugeClaimed.v954.is(ctx.event)) {
+    event = allForceGaugeClaimed.v954.decode(ctx.event)
+  }
+  return event;
+}
+export function formatFarmingPartiallyForceGaugeClaimedEvent(ctx: EventContext) {
+  let event
+  if (partiallyForceGaugeClaimed.v954.is(ctx.event)) {
+    event = partiallyForceGaugeClaimed.v954.decode(ctx.event)
+  }
+  return event;
+}
+export function formatFarmingAllRetiredEvent(ctx: EventContext) {
+  let event
+  if (allRetired.v954.is(ctx.event)) {
+    event = allRetired.v954.decode(ctx.event)
+  }
+  return event;
+}
+export function formatFarmingPartiallyRetiredEvent(ctx: EventContext) {
+  let event
+  if (partiallyRetired.v954.is(ctx.event)) {
+    event = partiallyRetired.v954.decode(ctx.event)
+  }
+  return event;
+}
+export function formatFarmingRetireLimitSetEvent(ctx: EventContext) {
+  let event
+  if (retireLimitSet.v954.is(ctx.event)) {
+    event = retireLimitSet.v954.decode(ctx.event)
   }
   return event;
 }
 
 export async function getFamingPoolInfo(
-  ctx: EventHandlerContext,
+  ctx: EventContext,
   pid: number,
-  block = {
-    hash: ctx.block.hash
-  }
+  block: ParentBlockHeader = ctx.block
 ) {
   let result
 
-  const farmingPoolInfoStorage = new FarmingPoolInfosStorage(ctx, block)
-  if (farmingPoolInfoStorage.isV954) {
-    result = await farmingPoolInfoStorage.asV954.get(pid)
-  } else if (farmingPoolInfoStorage.isV956) {
-    result = await farmingPoolInfoStorage.asV956.get(pid)
-  } else if (farmingPoolInfoStorage.isV962) {
-    result = await farmingPoolInfoStorage.asV962.get(pid)
-  } else if (farmingPoolInfoStorage.isV968) {
-    result = await farmingPoolInfoStorage.asV968.get(pid)
-  } else if (farmingPoolInfoStorage.isV980) {
-    result = await farmingPoolInfoStorage.asV980.get(pid)
-  } else if (farmingPoolInfoStorage.isV990) {
-    result = await farmingPoolInfoStorage.asV990.get(pid)
+  if (poolInfos.v954.is(block)) {
+    result = await poolInfos.v954.get(block, pid)
+  }
+  else if (poolInfos.v956.is(block)) {
+    result = await poolInfos.v956.get(block, pid)
+  }
+  else if (poolInfos.v962.is(block)) {
+    result = await poolInfos.v962.get(block, pid)
+  }
+  else if (poolInfos.v968.is(block)) {
+    result = await poolInfos.v968.get(block, pid)
+  }
+  else if (poolInfos.v980.is(block)) {
+    result = await poolInfos.v980.get(block, pid)
+  }
+  else if (poolInfos.v990.is(block)) {
+    result = await poolInfos.v990.get(block, pid)
+  }
+  else {
+    throw new Error('Unsupported spec')
   }
   return result
 }
 
 export async function getFamingSharesAndWithdrawnRewards(
-  ctx: EventHandlerContext,
+  ctx: EventContext,
   pid: number,
-  user: Uint8Array,
+  user: string,
 ) {
   let result
-
-  const storage = new FarmingSharesAndWithdrawnRewardsStorage(ctx, ctx.block)
-  if (storage.isV954) {
-    result = await storage.asV954.get(pid, user)
-  } else if (storage.isV956) {
-    result = await storage.asV956.get(pid, user)
-  } else if (storage.isV962) {
-    result = await storage.asV962.get(pid, user)
-  } else if (storage.isV980) {
-    result = await storage.asV980.get(pid, user)
-  } else if (storage.isV990) {
-    result = await storage.asV990.get(pid, user)
+  if (sharesAndWithdrawnRewards.v954.is(ctx.block)) {
+    result = await sharesAndWithdrawnRewards.v954.get(ctx.block, pid, user)
+  }
+  else if (sharesAndWithdrawnRewards.v956.is(ctx.block)) {
+    result = await sharesAndWithdrawnRewards.v956.get(ctx.block, pid, user)
+  }
+  else if (sharesAndWithdrawnRewards.v962.is(ctx.block)) {
+    result = await sharesAndWithdrawnRewards.v962.get(ctx.block, pid, user)
+  }
+  else if (sharesAndWithdrawnRewards.v980.is(ctx.block)) {
+    result = await sharesAndWithdrawnRewards.v980.get(ctx.block, pid, user)
+  }
+  else if (sharesAndWithdrawnRewards.v990.is(ctx.block)) {
+    result = await sharesAndWithdrawnRewards.v990.get(ctx.block, pid, user)
+  }
+  else {
+    throw new Error('Unsupported spec')
   }
   return result
 }
 
 
 export async function updateFarmingPoolInfo(
-  ctx: EventHandlerContext,
+  ctx: EventContext,
   pid: number,
 ) {
   const farmingPoolInfo = await getFamingPoolInfo(ctx, pid);
@@ -286,7 +311,7 @@ export async function updateFarmingPoolInfo(
           stakeToken: stakeToken,
           liquidityStaked: liquidityStaked,
           createdAtBlock: BigInt(ctx.block.height),
-          createdAtTimestamp: BigInt(ctx.block.timestamp),
+          createdAtTimestamp: BigInt(ctx.block.timestamp!),
           stakedUSD: stakeUSD,
           rewardUSDPerDay: rewardUSDRate,
           stakeApr
@@ -347,7 +372,7 @@ export async function updateFarmingPoolInfo(
         stakeToken: stakeToken,
         liquidityStaked: liquidityStaked,
         createdAtBlock: BigInt(ctx.block.height),
-        createdAtTimestamp: BigInt(ctx.block.timestamp),
+        createdAtTimestamp: BigInt(ctx.block.timestamp!),
         stakedUSD: stakeUSD,
         rewardUSDPerDay: rewardUSDRate,
         stakeApr
@@ -398,10 +423,10 @@ export async function updateFarmingPoolInfo(
 }
 
 export async function killFarmingPoolInfo(
-  ctx: EventHandlerContext,
+  ctx: EventContext,
   pid: number,
 ) {
-  const farmingPoolInfo = await getFamingPoolInfo(ctx, pid, { hash: ctx.block.parentHash });
+  const farmingPoolInfo = await getFamingPoolInfo(ctx, pid, ctx.block.getParent());
   const farmingTokens = farmingPoolInfo?.tokensProportion.map((item) => item[0])!;
   const farmingToken = farmingTokens[0];
   const assetIdIndex = currencyIdToAssetIndex(farmingToken);
@@ -492,7 +517,7 @@ export async function killFarmingPoolInfo(
           stakeToken: stakeToken,
           liquidityStaked: liquidityStaked,
           createdAtBlock: BigInt(ctx.block.height),
-          createdAtTimestamp: BigInt(ctx.block.timestamp),
+          createdAtTimestamp: BigInt(ctx.block.timestamp!),
           stakedUSD: stakeUSD,
           rewardUSDPerDay: rewardUSDRate,
           stakeApr
@@ -554,7 +579,7 @@ export async function killFarmingPoolInfo(
         stakeToken: stakeToken,
         liquidityStaked: liquidityStaked,
         createdAtBlock: BigInt(ctx.block.height),
-        createdAtTimestamp: BigInt(ctx.block.timestamp),
+        createdAtTimestamp: BigInt(ctx.block.timestamp!),
         stakedUSD: stakeUSD,
         rewardUSDPerDay: rewardUSDRate,
         stakeApr

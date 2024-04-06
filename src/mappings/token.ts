@@ -2,7 +2,7 @@ import { codec } from '@subsquid/ss58'
 import { getPair } from "../entities/pair";
 import { getPosition, getTransaction } from "../entities/utils";
 import { CHAIN_ID, ZERO_BD } from '../constants';
-import { EventHandlerContext, TOEKN_EVENT_TYPE } from "../types";
+import { TOEKN_EVENT_TYPE } from "../types";
 import { config } from "../config";
 import { Big as BigDecimal } from 'big.js'
 import { createLiquidityPosition } from '../utils/helpers';
@@ -17,53 +17,44 @@ import {
   Transaction,
   User
 } from "../model";
-import {
-  // CurrenciesDepositedEvent,
-  // CurrenciesTransferredEvent,
-  // CurrenciesWithdrawnEvent,
-  TokensDepositedEvent,
-  TokensTransferEvent,
-  TokensWithdrawnEvent
-} from "../types/events";
+import { tokens } from "../types/events"
 import {
   getPairStatusFromAssets,
   getTokenBalance,
   invertedTokenSymbolMap,
   parseToTokenIndex
 } from "../utils/token";
+import { EventContext } from '../processor';
 
 
-async function isCompleteMint(ctx: EventHandlerContext, mintId: string): Promise<boolean> {
+async function isCompleteMint(ctx: EventContext, mintId: string): Promise<boolean> {
   return !!(await ctx.store.get(Mint, mintId))?.sender // sufficient checks
 }
 
-export async function handleTokenDeposited(ctx: EventHandlerContext, type: TOEKN_EVENT_TYPE) {
+export async function handleTokenDeposited(ctx: EventContext, type: TOEKN_EVENT_TYPE) {
   const transactionHash = ctx.event.extrinsic?.hash
   if (!transactionHash) return
   let event
   if (type === TOEKN_EVENT_TYPE.Currencies) {
-    // const _event = new CurrenciesDepositedEvent(ctx, ctx.event)
-    // if (_event.isV802) {
-    //   event = { currencyId: _event.asV802[0], who: _event.asV802[1], amount: _event.asV802[2] }
-    // } else if (_event.isV906) {
-    //   event = { currencyId: _event.asV906[0], who: _event.asV906[1], amount: _event.asV906[2] }
-    // } else if (_event.isV916) {
-    //   event = { currencyId: _event.asV916[0], who: _event.asV916[1], amount: _event.asV916[2] }
-    // } else if (_event.isV920) {
-    //   event = { currencyId: _event.asV920[0], who: _event.asV920[1], amount: _event.asV920[2] }
-    // } else if (_event.isV925) {
-    //   event = _event.asV925
-    // } else if (_event.isV932) {
-    //   event = _event.asV932
-    // }
+    // no currency event on bifrost-polkadot
   } else {
-    const _event = new TokensDepositedEvent(ctx, ctx.event)
-    if (_event.isV952) {
-      event = _event.asV952
-    } else if (_event.isV956) {
-      event = _event.asV956
-    } else if (_event.isV962) {
-      event = _event.asV962
+    if (tokens.deposited.v952.is(ctx.event)) {
+      event = tokens.deposited.v952.decode(ctx.event)
+    }
+    else if (tokens.deposited.v956.is(ctx.event)) {
+      event = tokens.deposited.v956.decode(ctx.event)
+    }
+    else if (tokens.deposited.v962.is(ctx.event)) {
+      event = tokens.deposited.v962.decode(ctx.event)
+    }
+    else if (tokens.deposited.v980.is(ctx.event)) {
+      event = tokens.deposited.v980.decode(ctx.event)
+    }
+    else if (tokens.deposited.v990.is(ctx.event)) {
+      event = tokens.deposited.v990.decode(ctx.event)
+    }
+    else {
+      throw new Error('Unsupported spec')
     }
   }
 
@@ -97,7 +88,7 @@ export async function handleTokenDeposited(ctx: EventHandlerContext, type: TOEKN
     transaction = new Transaction({
       id: transactionHash,
       blockNumber: BigInt(ctx.block.height),
-      timestamp: new Date(ctx.block.timestamp),
+      timestamp: new Date(ctx.block.timestamp!),
       mints: [],
       burns: [],
       swaps: [],
@@ -115,7 +106,7 @@ export async function handleTokenDeposited(ctx: EventHandlerContext, type: TOEKN
       pair,
       to,
       liquidity: value,
-      timestamp: new Date(ctx.block.timestamp)
+      timestamp: new Date(ctx.block.timestamp!)
     })
     await ctx.store.save(mint)
     transaction.mints = mints.concat([mint.id])
@@ -129,33 +120,30 @@ export async function handleTokenDeposited(ctx: EventHandlerContext, type: TOEKN
   await createLiquiditySnapShot(ctx, pair, position)
 }
 
-export async function handleTokenWithdrawn(ctx: EventHandlerContext, type: TOEKN_EVENT_TYPE) {
+export async function handleTokenWithdrawn(ctx: EventContext, type: TOEKN_EVENT_TYPE) {
   const transactionHash = ctx.event.extrinsic?.hash
   if (!transactionHash) return
   let event
   if (type === TOEKN_EVENT_TYPE.Currencies) {
-    // const _event = new CurrenciesWithdrawnEvent(ctx, ctx.event)
-    // if (_event.isV802) {
-    //   event = { currencyId: _event.asV802[0], who: _event.asV802[1], amount: _event.asV802[2] }
-    // } else if (_event.isV906) {
-    //   event = { currencyId: _event.asV906[0], who: _event.asV906[1], amount: _event.asV906[2] }
-    // } else if (_event.isV916) {
-    //   event = { currencyId: _event.asV916[0], who: _event.asV916[1], amount: _event.asV916[2] }
-    // } else if (_event.isV920) {
-    //   event = { currencyId: _event.asV920[0], who: _event.asV920[1], amount: _event.asV920[2] }
-    // } else if (_event.isV925) {
-    //   event = _event.asV925
-    // } else if (_event.isV932) {
-    //   event = _event.asV932
-    // }
+    // no currency event on bifrost-polkadot
   } else {
-    const _event = new TokensWithdrawnEvent(ctx, ctx.event)
-    if (_event.isV952) {
-      event = _event.asV952
-    } else if (_event.isV956) {
-      event = _event.asV956
-    } else if (_event.isV962) {
-      event = _event.asV962
+    if (tokens.withdrawn.v952.is(ctx.event)) {
+      event = tokens.withdrawn.v952.decode(ctx.event)
+    }
+    else if (tokens.withdrawn.v956.is(ctx.event)) {
+      event = tokens.withdrawn.v956.decode(ctx.event)
+    }
+    else if (tokens.withdrawn.v962.is(ctx.event)) {
+      event = tokens.withdrawn.v962.decode(ctx.event)
+    }
+    else if (tokens.withdrawn.v980.is(ctx.event)) {
+      event = tokens.withdrawn.v980.decode(ctx.event)
+    }
+    else if (tokens.withdrawn.v990.is(ctx.event)) {
+      event = tokens.withdrawn.v990.decode(ctx.event)
+    }
+    else {
+      throw new Error('Unsupported spec')
     }
   }
 
@@ -189,7 +177,7 @@ export async function handleTokenWithdrawn(ctx: EventHandlerContext, type: TOEKN
     transaction = new Transaction({
       id: transactionHash,
       blockNumber: BigInt(ctx.block.height),
-      timestamp: new Date(ctx.block.timestamp),
+      timestamp: new Date(ctx.block.timestamp!),
       mints: [],
       burns: [],
       swaps: [],
@@ -211,7 +199,7 @@ export async function handleTokenWithdrawn(ctx: EventHandlerContext, type: TOEKN
         needsComplete: false,
         pair,
         liquidity: value,
-        timestamp: new Date(ctx.block.timestamp)
+        timestamp: new Date(ctx.block.timestamp!)
       })
     }
   } else {
@@ -221,7 +209,7 @@ export async function handleTokenWithdrawn(ctx: EventHandlerContext, type: TOEKN
       needsComplete: false,
       pair,
       liquidity: value,
-      timestamp: new Date(ctx.block.timestamp)
+      timestamp: new Date(ctx.block.timestamp!)
     })
   }
 
@@ -256,31 +244,28 @@ export async function handleTokenWithdrawn(ctx: EventHandlerContext, type: TOEKN
   await createLiquiditySnapShot(ctx, pair, position)
 }
 
-export async function handleTokenTransfer(ctx: EventHandlerContext, type: TOEKN_EVENT_TYPE) {
+export async function handleTokenTransfer(ctx: EventContext, type: TOEKN_EVENT_TYPE) {
   let event
   if (type === TOEKN_EVENT_TYPE.Currencies) {
-    // const _event = new CurrenciesTransferredEvent(ctx, ctx.event)
-    // if (_event.isV802) {
-    //   event = { currencyId: _event.asV802[0], from: _event.asV802[1], to: _event.asV802[2], amount: _event.asV802[3] }
-    // } else if (_event.isV906) {
-    //   event = { currencyId: _event.asV906[0], from: _event.asV906[1], to: _event.asV906[2], amount: _event.asV906[3] }
-    // } else if (_event.isV916) {
-    //   event = { currencyId: _event.asV916[0], from: _event.asV916[1], to: _event.asV916[2], amount: _event.asV916[3] }
-    // } else if (_event.isV920) {
-    //   event = { currencyId: _event.asV920[0], from: _event.asV920[1], to: _event.asV920[2], amount: _event.asV920[3] }
-    // } else if (_event.isV925) {
-    //   event = _event.asV925
-    // } else if (_event.isV932) {
-    //   event = _event.asV932
-    // }
+    // no currency event on bifrost-polkadot
   } else {
-    const _event = new TokensTransferEvent(ctx, ctx.event)
-    if (_event.isV952) {
-      event = _event.asV952
-    } else if (_event.isV956) {
-      event = _event.asV956
-    } else if (_event.isV962) {
-      event = _event.asV962
+    if (tokens.transfer.v952.is(ctx.event)) {
+      event = tokens.transfer.v952.decode(ctx.event)
+    } 
+    else if (tokens.transfer.v956.is(ctx.event)) {
+      event = tokens.transfer.v956.decode(ctx.event)
+    } 
+    else if (tokens.transfer.v962.is(ctx.event)) {
+      event = tokens.transfer.v962.decode(ctx.event)
+    } 
+    else if (tokens.transfer.v980.is(ctx.event)) {
+      event = tokens.transfer.v980.decode(ctx.event)
+    } 
+    else if (tokens.transfer.v990.is(ctx.event)) {
+      event = tokens.transfer.v990.decode(ctx.event)
+    } 
+    else {
+      throw new Error('Unsupported spec')
     }
   }
 
@@ -329,7 +314,7 @@ export async function handleTokenTransfer(ctx: EventHandlerContext, type: TOEKN_
 }
 
 export async function updateLiquidityPosition(
-  ctx: EventHandlerContext,
+  ctx: EventContext,
   pair: Pair,
   user: User
 ): Promise<LiquidityPosition> {
@@ -348,7 +333,7 @@ export async function updateLiquidityPosition(
 }
 
 export async function createLiquiditySnapShot(
-  ctx: EventHandlerContext,
+  ctx: EventContext,
   pair: Pair,
   position: LiquidityPosition,
 ): Promise<void> {
@@ -366,7 +351,7 @@ export async function createLiquiditySnapShot(
     snapshot = new LiquidityPositionSnapshot({
       id: `${position.id}${timestamp}`,
       liquidityPosition: position,
-      timestamp: new Date(timestamp),
+      timestamp: new Date(timestamp!),
       block: ctx.block.height,
       user: position.user,
       pair: position.pair,

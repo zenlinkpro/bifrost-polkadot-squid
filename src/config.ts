@@ -1,15 +1,8 @@
-import { ProcessorConfig } from "./types";
-import {lookupArchive} from "@subsquid/archive-registry"
-
 export const CHAIN_NODE = process.env.BIFROST_POLKADOT_CHAIN_NODE || 'wss://bifrost-polkadot-rpc.dwellir.com'
 
-export const config: ProcessorConfig = {
+export const config = {
   chainName: 'bifrost',
   prefix: 'bifrost',
-  dataSource: {
-    archive: lookupArchive('bifrost-polkadot'),
-    chain: CHAIN_NODE,
-  },
 }
 
 export const SUBSCAN_ENDPOINT = 'https://bifrost.api.subscan.io'
