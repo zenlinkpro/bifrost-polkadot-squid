@@ -35,7 +35,7 @@ export async function handleLiquiditySync(ctx: EventContext, pair: Pair) {
 
   const asset0 = assetIdFromAddress(token0.id)
   const asset1 = assetIdFromAddress(token1.id)
-  const [pairAccount] = await getPairStatusFromAssets(ctx, [asset0, asset1])
+  const [pairAccount] = await getPairStatusFromAssets(ctx, [asset0, asset1], false)
 
   if (!pairAccount) return
 

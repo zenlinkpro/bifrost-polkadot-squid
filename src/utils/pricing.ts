@@ -3,7 +3,7 @@ import { ONE_BD, ZERO_BD } from '../constants'
 import { getOrCreateToken } from '../entities/token'
 import { Pair } from '../model'
 import { assetIdFromAddress } from './token'
-import { queryBundleBySubScan } from './nativeToken'
+import { getBundlePriceFromStorage, queryBundleBySubScan } from './nativeToken'
 import { EventContext } from '../processor'
 
 export const WNATIVE = '2030-0-0'
@@ -15,7 +15,7 @@ export const aUSD = '2030-2-770'
 export const WHITELIST: string[] = [
   WNATIVE, // wnative
   DOT, // dot
-  vDOT, // vDOT
+  // vDOT, // vDOT
 ]
 
 // minimum liquidity required to count towards tracked volume for pairs with small # of Lps
@@ -25,6 +25,10 @@ export const MINIMUM_USD_THRESHOLD_NEW_PAIRS = new BigDecimal(1000)
 export const MINIMUM_LIQUIDITY_THRESHOLD_ETH = new BigDecimal(5)
 
 export async function getEthPriceInUSD(ctx: EventContext): Promise<BigDecimal> {
+  const oraclePrice = await getBundlePriceFromStorage(ctx)
+  if (oraclePrice) {
+    return BigDecimal(oraclePrice)
+  }
   const price = await queryBundleBySubScan(ctx.block.timestamp!);
 
   return BigDecimal(price)
